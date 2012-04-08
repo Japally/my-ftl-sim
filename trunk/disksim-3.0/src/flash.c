@@ -276,7 +276,6 @@ _u8 nand_page_write(_u32 psn, _u32 *lsns, _u8 isGC, int map_flag)
   _u16  pin = IND_F_SECT(psn);	// sector index, page index is the same as sector index 
   int i, valid_sect_num = 0;
 
-
   if(pbn >= nand_blk_num){
     printf("break !\n");
   }
@@ -284,11 +283,17 @@ _u8 nand_page_write(_u32 psn, _u32 *lsns, _u8 isGC, int map_flag)
   ASSERT(pbn < nand_blk_num);
   ASSERT(OFF_F_SECT(psn) == 0);
 
-  if(map_flag == 2) {
-        nand_blk[pbn].page_status[pin/SECT_NUM_PER_PAGE] = 1; // 1 for map table
+    if(map_flag == 3) {
+    nand_blk[pbn].page_status[pin/SECT_NUM_PER_PAGE] = 2; // 2 for zone map table
+    nand_blk[pbn].zone_id = 0;
+  }
+  else if(map_flag == 2) {
+    nand_blk[pbn].page_status[pin/SECT_NUM_PER_PAGE] = 1; // 1 for 2nd pagemap table
+    nand_blk[pbn].zone_id = lsns[0] / (SECT_NUM_PER_PAGE * PAGE_MAPDIR_NUM_PER_ZONE);
   }
   else{
     nand_blk[pbn].page_status[pin/SECT_NUM_PER_PAGE] = 0; // 0 for data 
+    nand_blk[pbn].zone_id = lsns[0] / (SECT_NUM_PER_PAGE * PAGE_NUM_PER_BLK * BLOCK_NUM_PER_ZONE);
   }
 
   for (i = 0; i <SECT_NUM_PER_PAGE; i++) {

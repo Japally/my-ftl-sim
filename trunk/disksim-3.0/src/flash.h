@@ -88,6 +88,7 @@ struct nand_blk_info {
   _s32 ipc : 10; // invalide page counter
   _s32 lwn : 12; // last written page number
   int page_status[PAGE_NUM_PER_BLK];
+  int zone_id;
 };
 
 extern _u32 nand_blk_num;
