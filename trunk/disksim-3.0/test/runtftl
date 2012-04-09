@@ -1,0 +1,8 @@
+# Script writer: Youngjae Kim (youkim@cse.,psu.edu)
+
+#!/bin/sh
+
+echo "Running TFTL..."
+../src/disksim tftl.parv tftl.outv ascii ./trace/test.file 0
+grep "IOdriver Response time average:" tftl.outv
+grep "IOdriver Response time std.dev." tftl.outv

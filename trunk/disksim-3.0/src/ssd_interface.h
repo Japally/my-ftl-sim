@@ -13,8 +13,6 @@
 #include <stdlib.h>
 #include "fast.h"
 #include "pagemap.h"
-#include "dftl.h"
-#include "tftl.h"
 #include "flash.h"
 #include "type.h"
 

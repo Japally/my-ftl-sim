@@ -22,9 +22,9 @@ disksim.o: disksim.c disksim_global.h disksim_rand48.h \
  /usr/include/bits/mathcalls.h disksim_assertlib.h \
  /usr/include/assert.h disksim_ioface.h disksim_pfface.h \
  disksim_iotrace.h config.h \
- /home/bang/disksim-3.0/libparam/include/libparam/libparam.h \
- /home/bang/disksim-3.0/libparam/include/libparam/bitvector.h \
- /home/bang/disksim-3.0/libddbg/include/libddbg/libddbg.h \
+ /home/bang/my-ftl-sim/disksim-3.0/libparam/include/libparam/libparam.h \
+ /home/bang/my-ftl-sim/disksim-3.0/libparam/include/libparam/bitvector.h \
+ /home/bang/my-ftl-sim/disksim-3.0/libddbg/include/libddbg/libddbg.h \
  modules/modules.h modules/disksim_bus_param.h \
  modules/disksim_bus_stats_param.h modules/disksim_cachedev_param.h \
  modules/disksim_cachemem_param.h modules/disksim_ctlr_param.h \
@@ -46,4 +46,4 @@ disksim.o: disksim.c disksim_global.h disksim_rand48.h \
  /usr/include/fcntl.h /usr/include/bits/fcntl.h \
  /usr/include/sys/mman.h /usr/include/bits/mman.h ssd_interface.h \
  fast.h type.h /usr/include/stdint.h /usr/include/bits/wchar.h \
- pagemap.h flash.h modules/disksim_global_param.c
+ pagemap.h flash.h tftl.h modules/disksim_global_param.c

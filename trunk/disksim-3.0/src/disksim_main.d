@@ -21,4 +21,5 @@ disksim_main.o: disksim_main.c disksim_global.h disksim_rand48.h \
  /usr/include/bits/nan.h /usr/include/bits/mathdef.h \
  /usr/include/bits/mathcalls.h disksim_assertlib.h \
  /usr/include/assert.h ssd_interface.h fast.h type.h \
- /usr/include/stdint.h /usr/include/bits/wchar.h pagemap.h flash.h
+ /usr/include/stdint.h /usr/include/bits/wchar.h pagemap.h flash.h \
+ tftl.h

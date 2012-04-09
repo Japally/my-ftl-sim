@@ -17,6 +17,7 @@
 
 #include "ssd_interface.h"
 #include "disksim_global.h"
+#include "dftl.h"
 
 extern int merge_switch_num;
 extern int merge_partial_num;

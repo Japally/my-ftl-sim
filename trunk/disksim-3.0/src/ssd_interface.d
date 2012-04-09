@@ -15,7 +15,7 @@ ssd_interface.o: ssd_interface.c ssd_interface.h /usr/include/stdio.h \
  /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h \
  /usr/include/alloca.h fast.h type.h /usr/include/stdint.h \
  /usr/include/bits/wchar.h /usr/include/assert.h pagemap.h flash.h \
- disksim_global.h disksim_rand48.h disksim_malloc.h \
+ tftl.h disksim_global.h disksim_rand48.h disksim_malloc.h \
  disksim_bitstring.h inline.h /usr/include/math.h \
  /usr/include/bits/huge_val.h /usr/include/bits/huge_valf.h \
  /usr/include/bits/huge_vall.h /usr/include/bits/inf.h \

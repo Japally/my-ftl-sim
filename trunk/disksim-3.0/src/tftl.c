@@ -11,7 +11,6 @@
 #include <string.h>
 
 #include "flash.h"
-#include "tftl.h"
 #include "ssd_interface.h"
 #include "disksim_global.h"
 
@@ -19,16 +18,15 @@ struct page_map_dir *page_mapdir;
 struct zone_map_dir *zone_mapdir;
 
 int curr_zone_id;
-int zone_num = total_util_blk_num / BLOCK_NUM_PER_ZONE ; //total_util_blk_num define at ssd_interface.c
 
 _u32 curr_zonemap_blk_no;
 _u16 curr_zonemap_page_no;
 
-_u32 curr_pagemap_blk_no[zone_num];
-_u16 curr_pagemap_page_no[zone_num];
+_u32 curr_pagemap_blk_no[ZONE_NUM];
+_u16 curr_pagemap_page_no[ZONE_NUM];
 
-_u32 curr_data_blk_no[zone_num];
-_u16 curr_data_page_no[zone_num];
+_u32 curr_data_blk_no[ZONE_NUM];
+_u16 curr_data_page_no[ZONE_NUM];
 
 extern int merge_switch_num;
 extern int merge_partial_num;
@@ -36,8 +34,6 @@ extern int merge_full_num;
 extern int page_num_for_2nd_map_table;
 int stat_gc_called_num;
 double total_gc_overhead_time;
-
-int map_pg_read=0;
 
 /****************************************************************
                              the map_table operation
@@ -52,7 +48,7 @@ void switch_zone(int zone_id)
   }
   
   //read the target 2nd_maptable from flash
-  zone_maptable_read (zone_id*SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 3)
+  zone_maptable_read (zone_id*SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 3);
   
   //update the curr_zone_id 
   curr_zone_id = zone_id;
@@ -507,7 +503,7 @@ void tftl_gc_run( int zone_id )
       
       //find a free block if the current one do not have enough free page
       if  (curr_pagemap_page_no[zone_id] >= SECT_NUM_PER_BLK) {
-         curr_pagemap_blk_no[zone_id] = nand_get_free_blk(1)
+         curr_pagemap_blk_no[zone_id] = nand_get_free_blk(1);
          curr_pagemap_page_no[zone_id] = 0;
       }
 
@@ -552,7 +548,6 @@ void tftl_pagemap_reset()
   delay_flash_update = 0; 
   read_count =0;
   write_count=0;
-  map_pg_read=0;
   save_count = 0;
 }
 
@@ -600,7 +595,7 @@ int tftl_init(blk_t blk_num, blk_t extra_num)
     tftl_pagemap[i].update = 0;
   }
 
-  for(i = 0; i<zone_num; i++){
+  for(i = 0; i<ZONE_NUM; i++){
     curr_data_blk_no[i] = nand_get_free_blk(0);
     curr_data_page_no[i] = 0;
     curr_pagemap_blk_no[i]  = nand_get_free_blk(0);
@@ -613,7 +608,7 @@ int tftl_init(blk_t blk_num, blk_t extra_num)
   curr_zone_id = 0;
 
   for(i = 0; i<zone_mapdir_num; i++){
-    zone_mapdir[i] = 0;
+    zone_mapdir[i].update = 0;
   }
 
   //initialize variables

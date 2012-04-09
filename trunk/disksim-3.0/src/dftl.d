@@ -16,7 +16,7 @@ dftl.o: dftl.c /usr/include/stdlib.h /usr/include/features.h \
  /usr/lib/gcc-lib/i486-linux-gnu/2.95.4/include/stdarg.h \
  /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
  /usr/include/stdint.h /usr/include/bits/wchar.h /usr/include/assert.h \
- dftl.h ssd_interface.h fast.h pagemap.h disksim_global.h \
+ tftl.h dftl.h ssd_interface.h fast.h pagemap.h disksim_global.h \
  disksim_rand48.h disksim_malloc.h disksim_bitstring.h inline.h \
  /usr/include/math.h /usr/include/bits/huge_val.h \
  /usr/include/bits/huge_valf.h /usr/include/bits/huge_vall.h \

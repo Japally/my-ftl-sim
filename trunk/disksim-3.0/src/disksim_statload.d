@@ -9,9 +9,9 @@ disksim_statload.o: disksim_statload.c /usr/include/stdio.h \
  /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
  /usr/include/assert.h /usr/include/string.h /usr/include/xlocale.h \
  config.h inline.h \
- /home/bang/disksim-3.0/libparam/include/libparam/libparam.h \
- /home/bang/disksim-3.0/libparam/include/libparam/bitvector.h \
- /home/bang/disksim-3.0/libddbg/include/libddbg/libddbg.h \
+ /home/bang/my-ftl-sim/disksim-3.0/libparam/include/libparam/libparam.h \
+ /home/bang/my-ftl-sim/disksim-3.0/libparam/include/libparam/bitvector.h \
+ /home/bang/my-ftl-sim/disksim-3.0/libddbg/include/libddbg/libddbg.h \
  modules/modules.h modules/disksim_bus_param.h \
  modules/disksim_bus_stats_param.h modules/disksim_cachedev_param.h \
  modules/disksim_cachemem_param.h modules/disksim_ctlr_param.h \

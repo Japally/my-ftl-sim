@@ -16,4 +16,4 @@ flash.o: flash.c /usr/include/stdlib.h /usr/include/features.h \
  /usr/lib/gcc-lib/i486-linux-gnu/2.95.4/include/stdarg.h \
  /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
  /usr/include/stdint.h /usr/include/bits/wchar.h /usr/include/assert.h \
- ssd_interface.h fast.h pagemap.h
+ tftl.h ssd_interface.h fast.h pagemap.h

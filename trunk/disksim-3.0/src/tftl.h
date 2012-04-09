@@ -54,8 +54,21 @@ struct zone_map_dir{
 #define PAGE_MAPDIR_NUM_PER_ZONE 512
 #define BLOCK_NUM_PER_ZONE 4096
 #define ZONE_TABLE_NUM_PER_ZONE 1
+#define ZONE_NUM 8192/BLOCK_NUM_PER_ZONE
 
 int TOTAL_MAP_ENTRIES; 
 
 sect_t tftl_pagemap_num;
 struct tftl_page_entry *tftl_pagemap;
+
+void zone_maptable_read (sect_t lsn, sect_t size, int mapdir_flag);
+void zone_maptable_write (sect_t lsn, sect_t size, int mapdir_flag);
+void page_maptable_read (sect_t lsn, sect_t size, int mapdir_flag);
+void page_maptable_write (sect_t lsn, sect_t size, int mapdir_flag);
+_u32 tftl_gc_cost_benefit( int zone_id );
+void tftl_gc_get_free_blk(int zone_id, int mapdir_flag);
+void tftl_gc_run( int zone_id );
+int tftl_init(blk_t blk_num, blk_t extra_num);
+
+
+

@@ -22,9 +22,9 @@ disksim_iodriver.o: disksim_iodriver.c disksim_global.h \
  /usr/include/bits/mathcalls.h disksim_assertlib.h \
  /usr/include/assert.h disksim_stat.h disksim_iosim.h disksim_ioface.h \
  disksim_device.h disksim_iotrace.h disksim_iodriver.h config.h \
- /home/bang/disksim-3.0/libparam/include/libparam/libparam.h \
- /home/bang/disksim-3.0/libparam/include/libparam/bitvector.h \
- /home/bang/disksim-3.0/libddbg/include/libddbg/libddbg.h \
+ /home/bang/my-ftl-sim/disksim-3.0/libparam/include/libparam/libparam.h \
+ /home/bang/my-ftl-sim/disksim-3.0/libparam/include/libparam/bitvector.h \
+ /home/bang/my-ftl-sim/disksim-3.0/libddbg/include/libddbg/libddbg.h \
  modules/modules.h modules/disksim_bus_param.h \
  modules/disksim_bus_stats_param.h modules/disksim_cachedev_param.h \
  modules/disksim_cachemem_param.h modules/disksim_ctlr_param.h \
@@ -40,5 +40,5 @@ disksim_iodriver.o: disksim_iodriver.c disksim_global.h \
  modules/disksim_synthio_param.h disksim_logorg.h disksim_orgface.h \
  disksim_ioqueue.h disksim_bus.h disksim_controller.h ssd_interface.h \
  fast.h type.h /usr/include/stdint.h /usr/include/bits/wchar.h \
- pagemap.h flash.h modules/disksim_iodriver_stats_param.c \
+ pagemap.h flash.h tftl.h modules/disksim_iodriver_stats_param.c \
  modules/disksim_iodriver_param.c
