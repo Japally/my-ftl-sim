@@ -17,3 +17,7 @@ echo "Running FAST..."
 grep "IOdriver Response time average:" fast.outv
 grep "IOdriver Response time std.dev." fast.outv
 
+echo "Running TFTL..."
+../src/disksim tftl.parv tftl.outv ascii ./trace/test.file 0
+grep "IOdriver Response time average:" tftl.outv
+grep "IOdriver Response time std.dev." tftl.outv

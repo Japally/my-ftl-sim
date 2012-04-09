@@ -17,7 +17,6 @@
 
 #include "ssd_interface.h"
 #include "disksim_global.h"
-#include "dftl.h"
 
 extern int merge_switch_num;
 extern int merge_partial_num;
@@ -177,6 +176,8 @@ void initFlash()
     case 3: ftl_op = opm_setup(); break;
     // fast
     case 4: ftl_op = lm_setup(); break;
+    // tftl
+    case 5: ftl_op = tftl_setup(); break;
 
     default: break;
   }
@@ -402,6 +403,11 @@ double callFsim(unsigned int secno, int scount, int operation)
     blkno = secno/4;
     bcount = (secno + scount -1)/4 - (secno)/4 + 1;
   }
+  // tftl scheme
+  else if(ftl_type == 5){
+    blkno = secno/4;
+    bcount = (secno + scount -1)/4 - (secno)/4 + 1;
+  }
 
   cnt = bcount;
 
@@ -569,9 +575,15 @@ double callFsim(unsigned int secno, int scount, int operation)
           }
           else read_count++;
 
-          send_flash_request(blkno*4, 4, operation, 1); //cache_min is a page for page baseed FTL
+          send_flash_request(blkno*4, 4, operation, 1); 
           blkno++;
         }
+        // page based FTL
+        if(ftl_type == 5){
+          send_flash_request(blkno*4, 4, operation, 1); 
+          blkno++;
+        }
+
     }
     break;
   }

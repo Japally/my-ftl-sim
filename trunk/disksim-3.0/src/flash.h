@@ -15,6 +15,8 @@
 #define SSD_LAYOUT 
 
 #include  "type.h"
+#include "tftl.h"
+
 
 #define LB_SIZE_512  1
 #define LB_SIZE_1024 2

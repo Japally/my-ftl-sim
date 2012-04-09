@@ -46,12 +46,14 @@ struct page_map_dir{
 struct zone_map_dir{
   _u32 free;
   _u32 ppn;
+  int update;
 };
 
 #define MAP_ENTRIES_PER_PAGE 512
 #define PAGE_MAPDIR_NUM_PER_PAGE 512
 #define PAGE_MAPDIR_NUM_PER_ZONE 512
 #define BLOCK_NUM_PER_ZONE 4096
+#define ZONE_TABLE_NUM_PER_ZONE 1
 
 int TOTAL_MAP_ENTRIES; 
 
