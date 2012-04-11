@@ -205,6 +205,7 @@ void printWearout()
 void endFlash()
 {
   nand_stat_print(outputfile);
+  printWearout();
   ftl_op->end;
   nand_end();
 }  

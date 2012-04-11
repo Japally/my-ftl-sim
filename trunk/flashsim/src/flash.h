@@ -119,4 +119,3 @@ _u32 stat_oob_read_num, stat_oob_write_num;
 
 #define WEAR_LEVEL_THRESHOLD   35 
 
-void flush(int); 
