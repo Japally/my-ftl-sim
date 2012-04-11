@@ -286,7 +286,6 @@ _u8 nand_page_write(_u32 psn, _u32 *lsns, _u8 isGC, int map_flag)
   if(map_flag == 3) {
     nand_blk[pbn].page_status[pin/SECT_NUM_PER_PAGE] = 2; // 2 for zone map table
     if (pin == 0) { nand_blk[pbn].zone_id = 0; }
-    ASSERT(lsns[0]/(SECT_NUM_PER_PAGE * ZONE_TABLE_NUM_PER_ZONE) == nand_blk[pbn].zone_id );
   }
   else if(map_flag == 2) {
     nand_blk[pbn].page_status[pin/SECT_NUM_PER_PAGE] = 1; // 1 for 2nd pagemap table

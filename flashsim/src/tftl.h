@@ -41,6 +41,7 @@ struct tftl_page_entry {
 struct page_map_dir{
   _u32 free;
   _u32 ppn;
+  int update;
 };
 
 struct zone_map_dir{
