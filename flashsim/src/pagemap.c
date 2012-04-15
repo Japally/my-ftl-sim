@@ -92,7 +92,7 @@ size_t pm_read(sect_t lsn, sect_t size, int mapdir_flag)
 int pm_gc_get_free_blk(int small, int mapdir_flag)
 {
   if (free_page_no[small] >= SECT_NUM_PER_BLK) {
-    free_blk_no[small] = nand_get_free_blk(1);
+    free_blk_no[small] = nand_get_free_blk(0,1);
     free_page_no[small] = 0;
 
     return -1;
@@ -166,7 +166,7 @@ size_t pm_write(sect_t lsn, sect_t size, int mapdir_flag)
 
   if (free_page_no[small] >= SECT_NUM_PER_BLK) 
   {
-    if ((free_blk_no[small] = nand_get_free_blk(0)) == -1) 
+    if ((free_blk_no[small] = nand_get_free_blk(0,0)) == -1) 
     {
       int j = 0;
 
@@ -274,7 +274,7 @@ int pm_init(blk_t blk_num, blk_t extra_num)
 
   extra_blk_num = extra_num;
 
-  free_blk_no[1] = nand_get_free_blk(0);
+  free_blk_no[1] = nand_get_free_blk(0,0);
   free_page_no[1] = 0;
 
   MAP_REAL_NUM_ENTRIES = 0;
