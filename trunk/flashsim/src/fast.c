@@ -127,7 +127,7 @@ struct seq_log_blk get_new_SW_blk()
     struct seq_log_blk new_SW_blk;
     int i;
 
-    new_SW_blk.logblk.pbn = nand_get_free_blk(1);
+    new_SW_blk.logblk.pbn = nand_get_free_blk(0,1);
     new_SW_blk.logblk.fpc = PAGE_NUM_PER_BLK; // chk if correct
     new_SW_blk.data_blk   = -1; 
     for( i = 0; i < PAGE_NUM_PER_BLK; i++) {
@@ -283,7 +283,7 @@ void merge_full_SW(int req_lsn)
     PMT[0] = global_SW_blk.logblk;
     pbn = global_SW_blk.data_blk;
 
-    new_pbn = nand_get_free_blk(1);
+    new_pbn = nand_get_free_blk(0,1);
 
     for(i = 0; i<total_blk_num; i++){
       if( BMT[i] ==  pbn){
@@ -373,7 +373,7 @@ void merge_full(int pmt_index)
                   merge_partial(global_SW_blk.logblk.pbn, global_SW_blk.data_blk, global_SW_blk.logblk.fpc,-1);
                   merge_partial_num++;
               
-                  global_SW_blk.logblk.pbn = nand_get_free_blk(1);
+                  global_SW_blk.logblk.pbn = nand_get_free_blk(0,1);
                   global_SW_blk.logblk.fpc = PAGE_NUM_PER_BLK; 
                   global_SW_blk.data_blk   = -1; 
                   for( h = 0; h < PAGE_NUM_PER_BLK; h++) {
@@ -384,7 +384,7 @@ void merge_full(int pmt_index)
                   continue;
 
           }
-          new_pbn = nand_get_free_blk(1);
+          new_pbn = nand_get_free_blk(0,1);
           BMT[lbn] = new_pbn;
           merge_full_num++;
 
@@ -514,7 +514,7 @@ int getRWblk()
     }
     
     if( PMT[global_currRWblk].pbn == -1) {
-        PMT[global_currRWblk].pbn = nand_get_free_blk(1);
+        PMT[global_currRWblk].pbn = nand_get_free_blk(0,1);
         if(PMT[global_currRWblk].pbn == -1){
           printf("shouldn't happen");
           ASSERT(0);
@@ -560,7 +560,7 @@ size_t writeToLogBlock(sect_t lsn, int lbn, int lpn)
      page_offset = lpn % PAGE_NUM_PER_BLK;   //PAGE_NUM_PER_BLK = 64
 
      if(global_SW_blk.logblk.pbn == -1 ) {
-          global_SW_blk.logblk.pbn = nand_get_free_blk(1);
+          global_SW_blk.logblk.pbn = nand_get_free_blk(0,1);
           global_SW_blk.logblk.fpc = PAGE_NUM_PER_BLK; 
           global_SW_blk.data_blk   = -1; 
           for( i = 0; i < PAGE_NUM_PER_BLK; i++) {
@@ -595,7 +595,7 @@ size_t writeToLogBlock(sect_t lsn, int lbn, int lpn)
               }
 
               //allocate new SW_blk and initialize it
-              global_SW_blk.logblk.pbn = nand_get_free_blk(1);
+              global_SW_blk.logblk.pbn = nand_get_free_blk(0,1);
               global_SW_blk.logblk.fpc = PAGE_NUM_PER_BLK; 
               global_SW_blk.data_blk   = -1; 
               for( i = 0; i < PAGE_NUM_PER_BLK; i++) {
@@ -716,7 +716,7 @@ size_t writeToLogBlock(sect_t lsn, int lbn, int lpn)
                   merge_partial_num++;
               } 
           
-              global_SW_blk.logblk.pbn = nand_get_free_blk(1);
+              global_SW_blk.logblk.pbn = nand_get_free_blk(0,1);
               global_SW_blk.logblk.fpc = PAGE_NUM_PER_BLK; 
               global_SW_blk.data_blk   = -1; 
               for( i = 0; i < PAGE_NUM_PER_BLK; i++) {
@@ -772,7 +772,7 @@ size_t writeToLogBlock(sect_t lsn, int lbn, int lpn)
             merge_full(firstRWblk);
 
             //initialize
-            PMT[firstRWblk].pbn = nand_get_free_blk(1);
+            PMT[firstRWblk].pbn = nand_get_free_blk(0,1);
             PMT[firstRWblk].fpc = PAGE_NUM_PER_BLK;
             memset(PMT[firstRWblk].lpn, 0xFF, sizeof(int)*PAGE_NUM_PER_BLK);
             memset(PMT[firstRWblk].lpn_status, 0x00, sizeof(int)*PAGE_NUM_PER_BLK);
@@ -808,7 +808,7 @@ size_t writeToLogBlock(sect_t lsn, int lbn, int lpn)
 int getPbnFromBMT(int lbn)
 {
       if ( BMT[lbn] == -1 ) {
-          BMT[lbn] = nand_get_free_blk(1);
+          BMT[lbn] = nand_get_free_blk(0,1);
       }
       return BMT[lbn];
 }

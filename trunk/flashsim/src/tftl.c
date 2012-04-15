@@ -93,9 +93,9 @@ void zone_maptable_write (sect_t lsn, sect_t size, int mapdir_flag)
   
   s_lsn = lpn * SECT_NUM_PER_PAGE;
   
-  	if (curr_zonemap_page_no >= SECT_NUM_PER_BLK) {
-      if ((curr_zonemap_blk_no = nand_get_free_blk(0)) == -1) {
-        while (free_blk_num < 3 ) { tftl_gc_run(curr_zone_id);}
+  if (curr_zonemap_page_no >= SECT_NUM_PER_BLK) {
+      if ((curr_zonemap_blk_no = nand_get_free_blk(0,0)) == -1) {
+        while (free_blk_num[curr_zone_id] < 5 ) { tftl_gc_run(curr_zone_id);}
         tftl_gc_get_free_blk(curr_zone_id, mapdir_flag);
       }
       else {
@@ -171,9 +171,9 @@ void page_maptable_write (sect_t lsn, sect_t size, int mapdir_flag)
 
   s_lsn = lpn * SECT_NUM_PER_PAGE;
 
-  	if (curr_pagemap_page_no[zone_id] >= SECT_NUM_PER_BLK) {
-      if ((curr_pagemap_blk_no[zone_id]  = nand_get_free_blk(0)) == -1) {
-        while (free_blk_num < 3 ){ tftl_gc_run(zone_id);}
+  if (curr_pagemap_page_no[zone_id] >= SECT_NUM_PER_BLK) {
+      if ((curr_pagemap_blk_no[zone_id] = nand_get_free_blk(zone_id, 0)) == -1) {
+        while (free_blk_num[zone_id] < 5 ){ tftl_gc_run(zone_id);}
         tftl_gc_get_free_blk(zone_id, mapdir_flag);
       }
       else {
@@ -277,6 +277,7 @@ size_t tftl_write(sect_t lsn, sect_t size, int mapdir_flag)
   ASSERT(lpn < tftl_pagemap_num);
   ASSERT(lpn + size_page <= tftl_pagemap_num);
 
+
   s_lsn = lpn * SECT_NUM_PER_PAGE;
 
 //1.switch the working zone to target zone
@@ -294,15 +295,15 @@ size_t tftl_write(sect_t lsn, sect_t size, int mapdir_flag)
   }
 
 //3.find a free page to write the new data
-  	if (curr_data_page_no[zone_id] >= SECT_NUM_PER_BLK) {
-      if ((curr_data_blk_no[zone_id] = nand_get_free_blk(0)) == -1) {
-        while (free_blk_num < 3 ){  tftl_gc_run( zone_id );}
+  if (curr_data_page_no[zone_id] >= SECT_NUM_PER_BLK) {
+      if ((curr_data_blk_no[zone_id] = nand_get_free_blk(zone_id, 0)) == -1) {
+        while (free_blk_num[zone_id] < 5 ){ tftl_gc_run( zone_id );}
         tftl_gc_get_free_blk(zone_id, mapdir_flag);
       }
       else {
       curr_data_page_no[zone_id] = 0;
       }
-    }
+  }
 
 //4.check the page already be written, if yes and invalidate the page
   if (tftl_pagemap[lpn].free == 0) {
@@ -336,18 +337,21 @@ _u32 tftl_gc_cost_benefit( int zone_id )
 {
   int max_cb = 0;
   int blk_cb;
+  int zone_blk_start;
+  int zone_blk_end;
   
   _u32 max_blk = -1, i;
 
-  for (i = 0; i < nand_blk_num; i++) {
-    if ( nand_blk[i].zone_id == zone_id ){
+  zone_blk_start = zone_id*(BLOCK_NUM_PER_ZONE + 128);
+  zone_blk_end = (zone_id+1)*(BLOCK_NUM_PER_ZONE+128) - 1;
+
+  for (i = zone_blk_start; i < zone_blk_end; i++) {
       if (i == curr_data_blk_no[zone_id] || i == curr_pagemap_blk_no[zone_id] || i == curr_zonemap_blk_no ){continue;}
       blk_cb = nand_blk[i].ipc;
       if (blk_cb > max_cb) {
         max_cb = blk_cb;
         max_blk = i;
       }
-    }
   }
 
   ASSERT(max_blk != -1);
@@ -359,17 +363,17 @@ void tftl_gc_get_free_blk(int zone_id, int mapdir_flag)
 {
   if ( mapdir_flag == 3 ){
     if (curr_zonemap_page_no >= SECT_NUM_PER_BLK) {
-      curr_zonemap_blk_no = nand_get_free_blk(1);
+      curr_zonemap_blk_no = nand_get_free_blk(0, 1);
       curr_zonemap_page_no = 0;
     }
   }else if ( mapdir_flag == 2 ){
     if (curr_pagemap_page_no[zone_id] >= SECT_NUM_PER_BLK) {
-      curr_pagemap_blk_no[zone_id] = nand_get_free_blk(1);
+      curr_pagemap_blk_no[zone_id] = nand_get_free_blk(zone_id, 1);
       curr_pagemap_page_no[zone_id] = 0;
     }
   }else if ( mapdir_flag == 1 ){
     if (curr_data_page_no[zone_id] >= SECT_NUM_PER_BLK) {
-      curr_data_blk_no[zone_id] = nand_get_free_blk(1);
+      curr_data_blk_no[zone_id] = nand_get_free_blk(zone_id, 1);
       curr_data_page_no[zone_id] = 0;
     }
   }
@@ -514,7 +518,7 @@ void tftl_gc_run( int zone_id )
       
       //find a free block if the current one do not have enough free page
       if  (curr_pagemap_page_no[zone_id] >= SECT_NUM_PER_BLK) {
-         curr_pagemap_blk_no[zone_id] = nand_get_free_blk(1);
+         curr_pagemap_blk_no[zone_id] = nand_get_free_blk(zone_id, 1);
          curr_pagemap_page_no[zone_id] = 0;
       }
 
@@ -595,21 +599,25 @@ int tftl_init(blk_t blk_num, blk_t extra_num)
     tftl_pagemap[i].update = 0;
   }
 
-  for(i = 0; i<ZONE_NUM; i++){
-    curr_data_blk_no[i] = nand_get_free_blk(0);
-    curr_data_page_no[i] = 0;
-    curr_pagemap_blk_no[i]  = nand_get_free_blk(0);
-    curr_pagemap_page_no[i]  = 0;
-  }
-
-  curr_zonemap_blk_no = nand_get_free_blk(0);
+  curr_zonemap_blk_no = nand_get_free_blk(0,0);
   curr_zonemap_page_no = 0;
+
+  for(i = 0; i<ZONE_NUM; i++){
+    curr_pagemap_blk_no[i]  = nand_get_free_blk(i,0);
+    curr_pagemap_page_no[i]  = 0;
+    curr_data_blk_no[i] = nand_get_free_blk(i,0);
+    curr_data_page_no[i] = 0;
+  }
 
   curr_zone_id = 0;
   curr_2nd_maptable_no = 0;
 
   for(i = 0; i<zone_mapdir_num; i++){
     zone_mapdir[i].update = 0;
+  }
+
+  for(i = 0; i<page_mapdir_num; i++){
+    page_mapdir[i].update = 0;
   }
 
   //initialize variables

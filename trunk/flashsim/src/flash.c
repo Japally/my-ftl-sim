@@ -117,6 +117,7 @@ int nand_init (_u32 blk_num, _u8 min_free_blk_num)
     nand_blk[blk_no].fpc = SECT_NUM_PER_BLK;
     nand_blk[blk_no].ipc = 0;
     nand_blk[blk_no].lwn = -1;
+	  nand_blk[blk_no].zone_id = -1;
 
 
     for(i = 0; i<SECT_NUM_PER_BLK; i++){
@@ -129,7 +130,11 @@ int nand_init (_u32 blk_num, _u8 min_free_blk_num)
       nand_blk[blk_no].page_status[i] = -1; // 0: data, 1: map table
     }
   }
-  free_blk_num = nand_blk_num;
+
+	for (i = 0; i < ZONE_NUM; i++) {
+		free_blk_num[i] = BLOCK_NUM_PER_ZONE + 128;
+	}
+  
 
   free_blk_idx =0;
 
@@ -336,6 +341,9 @@ _u8 nand_page_write(_u32 psn, _u32 *lsns, _u8 isGC, int map_flag)
 void nand_erase (_u32 blk_no)
 {
   int i;
+	int zone_id;
+
+	zone_id = blk_no/(BLOCK_NUM_PER_ZONE+128);
 
   ASSERT(blk_no < nand_blk_num);
 
@@ -350,6 +358,7 @@ void nand_erase (_u32 blk_no)
   nand_blk[blk_no].fpc = SECT_NUM_PER_BLK;
   nand_blk[blk_no].ipc = 0;
   nand_blk[blk_no].lwn = -1;
+  nand_blk[blk_no].zone_id = -1;
 
 
   for(i = 0; i<SECT_NUM_PER_BLK; i++){
@@ -363,7 +372,7 @@ void nand_erase (_u32 blk_no)
     nand_blk[blk_no].page_status[i] = -1;
   }
 
-  free_blk_num++;
+  free_blk_num[zone_id]++;
 
   nand_stat(BLOCK_ERASE);
 }
@@ -393,21 +402,28 @@ void nand_invalidate (_u32 psn, _u32 lsn)
 
 }
 
-_u32 nand_get_free_blk (int isGC) 
+_u32 nand_get_free_blk (int zone_id, int isGC) 
 {
   _u32 blk_no = -1, i;
   int flag = 0,flag1=0;
+  int zone_blk_start;
+  int zone_blk_end;
+
   flag = 0;
   flag1 = 0;
 
   MIN_ERASE = 9999999;
+
+	zone_blk_start = zone_id*BLOCK_NUM_PER_ZONE + 128*zone_id;
+	zone_blk_end = (zone_id+1)*BLOCK_NUM_PER_ZONE - 1 + 128*(zone_id+1);
+
   //in case that there is no avaible free block -> GC should be called !
-  if ((isGC == 0) && (min_fb_num >= free_blk_num)) {
+  if ((isGC == 0) && (10 >= free_blk_num[zone_id])) {
     //printf("min_fb_num: %d\n", min_fb_num);
     return -1;
   }
 
-  for(i = 0; i < nand_blk_num; i++) 
+  for(i = zone_blk_start; i < zone_blk_end; i++) 
   {
     if (nand_blk[i].state.free == 1) {
       flag1 = 1;
@@ -420,7 +436,7 @@ _u32 nand_get_free_blk (int isGC)
     }
   }
   if(flag1 != 1){
-    printf("no free block left=%d",free_blk_num);
+    printf("no free block left=%d, zone_id = %d",free_blk_num[zone_id],zone_id);
     
   ASSERT(0);
   }
@@ -432,7 +448,7 @@ _u32 nand_get_free_blk (int isGC)
         nand_blk[blk_no].state.free = 0;
 
         free_blk_idx = blk_no;
-        free_blk_num--;
+        free_blk_num[zone_id]--;
 
         return blk_no;
   }

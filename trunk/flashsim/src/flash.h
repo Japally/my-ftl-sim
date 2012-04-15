@@ -103,13 +103,13 @@ _u8 nand_page_read (_u32 psn, _u32 *lsns, _u8 isGC);
 _u8 nand_page_write (_u32 psn, _u32 *lsns, _u8 isGC, int map_flag);
 void nand_erase (_u32 blk_no);
 void nand_invalidate (_u32 psn, _u32 lsn);
-_u32 nand_get_free_blk(int);
+_u32 nand_get_free_blk (int zone_id, int isGC);
 void nand_stat(int);
 void nand_stat_reset();
 void nand_stat_print(FILE *outFP);
 int nand_oob_read(_u32 psn);
 
-_u32 free_blk_num;
+_u32 free_blk_num[ZONE_NUM];
 _u32 free_blk_idx;
 
 _u32 stat_read_num, stat_write_num, stat_erase_num;
