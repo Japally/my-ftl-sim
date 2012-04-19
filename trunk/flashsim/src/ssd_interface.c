@@ -195,7 +195,7 @@ void printWearout()
   
   for(i = 0; i<nand_blk_num; i++)
   {
-    fprintf(fp, "%d %d\n", i, nand_blk[i].state.ec); 
+    fprintf(fp, "%d %d\n", i, nand_blk[i].state.ec);
   }
 
   fclose(fp);
@@ -204,6 +204,7 @@ void printWearout()
 
 void endFlash()
 {
+
   nand_stat_print(outputfile);
   printWearout();
   ftl_op->end;

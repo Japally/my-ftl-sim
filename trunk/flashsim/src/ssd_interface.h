@@ -51,6 +51,7 @@ double callFsim(unsigned int secno, int scount, int operation);
 int write_count;
 int read_count;
 
+
 int flash_read_num;
 int flash_write_num;
 int flash_gc_read_num;

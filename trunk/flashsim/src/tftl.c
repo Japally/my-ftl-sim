@@ -94,12 +94,12 @@ void zone_maptable_write (sect_t lsn, sect_t size, int mapdir_flag)
   s_lsn = lpn * SECT_NUM_PER_PAGE;
   
   if (curr_zonemap_page_no >= SECT_NUM_PER_BLK) {
-      if ((curr_zonemap_blk_no = nand_get_free_blk(0,0)) == -1) {
-        while (free_blk_num[curr_zone_id] < 5 ) { tftl_gc_run(curr_zone_id);}
+      if ((curr_zonemap_blk_no = nand_get_free_blk(curr_zone_id,0)) == -1) {
+        while (free_blk_num[curr_zone_id] < 50 ) { tftl_gc_run(curr_zone_id);}
         tftl_gc_get_free_blk(curr_zone_id, mapdir_flag);
       }
       else {
-      curr_zonemap_page_no = 0;
+        curr_zonemap_page_no = 0;
       }
     }
 
@@ -173,7 +173,7 @@ void page_maptable_write (sect_t lsn, sect_t size, int mapdir_flag)
 
   if (curr_pagemap_page_no[zone_id] >= SECT_NUM_PER_BLK) {
       if ((curr_pagemap_blk_no[zone_id] = nand_get_free_blk(zone_id, 0)) == -1) {
-        while (free_blk_num[zone_id] < 5 ){ tftl_gc_run(zone_id);}
+        while (free_blk_num[zone_id] < 50 ){ tftl_gc_run(zone_id);}
         tftl_gc_get_free_blk(zone_id, mapdir_flag);
       }
       else {
@@ -297,7 +297,7 @@ size_t tftl_write(sect_t lsn, sect_t size, int mapdir_flag)
 //3.find a free page to write the new data
   if (curr_data_page_no[zone_id] >= SECT_NUM_PER_BLK) {
       if ((curr_data_blk_no[zone_id] = nand_get_free_blk(zone_id, 0)) == -1) {
-        while (free_blk_num[zone_id] < 5 ){ tftl_gc_run( zone_id );}
+        while (free_blk_num[zone_id] < 50 ){ tftl_gc_run( zone_id );}
         tftl_gc_get_free_blk(zone_id, mapdir_flag);
       }
       else {
@@ -363,7 +363,7 @@ void tftl_gc_get_free_blk(int zone_id, int mapdir_flag)
 {
   if ( mapdir_flag == 3 ){
     if (curr_zonemap_page_no >= SECT_NUM_PER_BLK) {
-      curr_zonemap_blk_no = nand_get_free_blk(0, 1);
+      curr_zonemap_blk_no = nand_get_free_blk(zone_id, 1);
       curr_zonemap_page_no = 0;
     }
   }else if ( mapdir_flag == 2 ){
@@ -424,7 +424,7 @@ void tftl_gc_run( int zone_id )
   }
 /**************************************************************************************/
 
-  for (i = 0; i < PAGE_NUM_PER_BLK; i++) 
+  for (i = 0; i < PAGE_NUM_PER_BLK; i++)
   {
     valid_flag = nand_oob_read( SECTOR(victim_blk_no, i * SECT_NUM_PER_PAGE));
 
@@ -445,7 +445,7 @@ void tftl_gc_run( int zone_id )
           if(nand_blk[victim_blk_no].page_status[i] == 2)
           {
             tftl_gc_get_free_blk( zone_id, 3 );
-            ASSERT(zone_id == 0);
+            //ASSERT(zone_id == 0);
             zone_mapdir[(copy_lsn[0]/SECT_NUM_PER_PAGE)].ppn = BLK_PAGE_NO_SECT(SECTOR(curr_zonemap_blk_no, curr_zonemap_page_no));
             nand_page_write(SECTOR(curr_zonemap_blk_no, curr_zonemap_page_no) & (~OFF_MASK_SECT), copy_lsn, 1, 3);
             curr_zonemap_page_no += SECT_NUM_PER_PAGE;
@@ -507,6 +507,7 @@ void tftl_gc_run( int zone_id )
 
   for ( i=0; i < k; i++) {
       //read the 2nd map table and invalidate it 
+
       nand_page_read(temp_arr[i]*SECT_NUM_PER_PAGE,copy,1);
             if (temp_arr1[i]/(SECT_NUM_PER_PAGE*MAP_ENTRIES_PER_PAGE) != copy[0]/SECT_NUM_PER_PAGE) {
                 printf("temp_arr1[i] = %d , copy[0] = %d", temp_arr1[i], copy[0]);}
@@ -630,6 +631,7 @@ int tftl_init(blk_t blk_num, blk_t extra_num)
   write_count =0;
   read_count = 0;
   save_count = 0;
+
 
   //initialize 2nd map table
   for(i = 0; i<page_mapdir_num; i++){

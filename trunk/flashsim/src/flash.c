@@ -117,7 +117,7 @@ int nand_init (_u32 blk_num, _u8 min_free_blk_num)
     nand_blk[blk_no].fpc = SECT_NUM_PER_BLK;
     nand_blk[blk_no].ipc = 0;
     nand_blk[blk_no].lwn = -1;
-	  nand_blk[blk_no].zone_id = -1;
+    nand_blk[blk_no].zone_id = -1;
 
 
     for(i = 0; i<SECT_NUM_PER_BLK; i++){
@@ -341,9 +341,9 @@ _u8 nand_page_write(_u32 psn, _u32 *lsns, _u8 isGC, int map_flag)
 void nand_erase (_u32 blk_no)
 {
   int i;
-	int zone_id;
+  int zone_id;
 
-	zone_id = blk_no/(BLOCK_NUM_PER_ZONE+128);
+  zone_id = blk_no/(BLOCK_NUM_PER_ZONE+128);
 
   ASSERT(blk_no < nand_blk_num);
 
@@ -414,11 +414,11 @@ _u32 nand_get_free_blk (int zone_id, int isGC)
 
   MIN_ERASE = 9999999;
 
-	zone_blk_start = zone_id*BLOCK_NUM_PER_ZONE + 128*zone_id;
-	zone_blk_end = (zone_id+1)*BLOCK_NUM_PER_ZONE - 1 + 128*(zone_id+1);
+  zone_blk_start = zone_id*BLOCK_NUM_PER_ZONE + 128*zone_id;
+  zone_blk_end = (zone_id+1)*BLOCK_NUM_PER_ZONE - 1 + 128*(zone_id+1);
 
   //in case that there is no avaible free block -> GC should be called !
-  if ((isGC == 0) && (10 >= free_blk_num[zone_id])) {
+  if ((isGC == 0) && (50 >= free_blk_num[zone_id])) {
     //printf("min_fb_num: %d\n", min_fb_num);
     return -1;
   }
@@ -448,7 +448,7 @@ _u32 nand_get_free_blk (int zone_id, int isGC)
         nand_blk[blk_no].state.free = 0;
 
         free_blk_idx = blk_no;
-        free_blk_num[zone_id]--;
+        free_blk_num[zone_id]--;       
 
         return blk_no;
   }
