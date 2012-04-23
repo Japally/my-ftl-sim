@@ -26,6 +26,7 @@
 #define PAGE_NUM_PER_BLK  64
 #define SECT_NUM_PER_BLK  (SECT_NUM_PER_PAGE * PAGE_NUM_PER_BLK)
 #define SECT_SIZE_B 512
+#define SPARE_BLK_NUM_PER_ZONE 128
 
 #define SECT_BITS       2
 #define PAGE_BITS       6
@@ -104,6 +105,7 @@ _u8 nand_page_write (_u32 psn, _u32 *lsns, _u8 isGC, int map_flag);
 void nand_erase (_u32 blk_no);
 void nand_invalidate (_u32 psn, _u32 lsn);
 _u32 nand_get_free_blk (int zone_id, int isGC);
+_u32 nand_get_max_free_blk (int zone_id, int isGC);
 void nand_stat(int);
 void nand_stat_reset();
 void nand_stat_print(FILE *outFP);
