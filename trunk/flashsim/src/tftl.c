@@ -29,6 +29,9 @@ _u16 curr_pagemap_page_no[ZONE_NUM];
 _u32 curr_data_blk_no[ZONE_NUM];
 _u16 curr_data_page_no[ZONE_NUM];
 
+_u32 curr_cold_data_blk_no[ZONE_NUM];
+_u16 curr_cold_data_page_no[ZONE_NUM];
+
 /****************************************************************************************
                                the map_table operation
 *****************************************************************************************/
@@ -99,7 +102,7 @@ void zone_maptable_write (sect_t lsn, sect_t size, int mapdir_flag)
         tftl_gc_get_free_blk(curr_zone_id, mapdir_flag);
       }
       else {
-        curr_zonemap_page_no = 0;
+      curr_zonemap_page_no = 0;
       }
     }
 
@@ -301,7 +304,7 @@ size_t tftl_write(sect_t lsn, sect_t size, int mapdir_flag)
         tftl_gc_get_free_blk(zone_id, mapdir_flag);
       }
       else {
-      curr_data_page_no[zone_id] = 0;
+        curr_data_page_no[zone_id] = 0;
       }
   }
 
@@ -342,11 +345,11 @@ _u32 tftl_gc_cost_benefit( int zone_id )
   
   _u32 max_blk = -1, i;
 
-  zone_blk_start = zone_id*(BLOCK_NUM_PER_ZONE + 128);
-  zone_blk_end = (zone_id+1)*(BLOCK_NUM_PER_ZONE+128) - 1;
+  zone_blk_start = zone_id*(BLOCK_NUM_PER_ZONE + SPARE_BLK_NUM_PER_ZONE);
+  zone_blk_end = (zone_id+1)*(BLOCK_NUM_PER_ZONE + SPARE_BLK_NUM_PER_ZONE);
 
   for (i = zone_blk_start; i < zone_blk_end; i++) {
-      if (i == curr_data_blk_no[zone_id] || i == curr_pagemap_blk_no[zone_id] || i == curr_zonemap_blk_no ){continue;}
+      if (i == curr_data_blk_no[zone_id] || i == curr_pagemap_blk_no[zone_id] || i == curr_zonemap_blk_no || i == curr_cold_data_blk_no[zone_id]){continue;}
       blk_cb = nand_blk[i].ipc;
       if (blk_cb > max_cb) {
         max_cb = blk_cb;
@@ -375,6 +378,11 @@ void tftl_gc_get_free_blk(int zone_id, int mapdir_flag)
     if (curr_data_page_no[zone_id] >= SECT_NUM_PER_BLK) {
       curr_data_blk_no[zone_id] = nand_get_free_blk(zone_id, 1);
       curr_data_page_no[zone_id] = 0;
+    }
+  }else if ( mapdir_flag == 0 ){
+    if (curr_cold_data_page_no[zone_id] >= SECT_NUM_PER_BLK) {
+      curr_cold_data_blk_no[zone_id] = nand_get_max_free_blk(zone_id, 1);
+      curr_cold_data_page_no[zone_id] = 0;
     }
   }
 }
@@ -424,7 +432,7 @@ void tftl_gc_run( int zone_id )
   }
 /**************************************************************************************/
 
-  for (i = 0; i < PAGE_NUM_PER_BLK; i++)
+  for (i = 0; i < PAGE_NUM_PER_BLK; i++) 
   {
     valid_flag = nand_oob_read( SECTOR(victim_blk_no, i * SECT_NUM_PER_PAGE));
 
@@ -460,11 +468,11 @@ void tftl_gc_run( int zone_id )
             zone_mapdir[zone_id].update = 1;
           }
           else{
-            tftl_gc_get_free_blk( zone_id, 1 );
-            tftl_pagemap[(copy_lsn[0]/SECT_NUM_PER_PAGE)].ppn = BLK_PAGE_NO_SECT(SECTOR(curr_data_blk_no[zone_id], curr_data_page_no[zone_id]));
-            nand_page_write(SECTOR(curr_data_blk_no[zone_id], curr_data_page_no[zone_id]) & (~OFF_MASK_SECT), copy_lsn, 1, 1);
+            tftl_gc_get_free_blk( zone_id, 0 ); //find the curr_cold_blk,so the flag is 0
+            tftl_pagemap[(copy_lsn[0]/SECT_NUM_PER_PAGE)].ppn = BLK_PAGE_NO_SECT(SECTOR(curr_cold_data_blk_no[zone_id], curr_cold_data_page_no[zone_id]));
+            nand_page_write(SECTOR(curr_cold_data_blk_no[zone_id], curr_cold_data_page_no[zone_id]) & (~OFF_MASK_SECT), copy_lsn, 1, 1);
             ASSERT(copy_lsn[0]/(SECT_NUM_PER_PAGE*PAGE_NUM_PER_BLK*BLOCK_NUM_PER_ZONE) == zone_id);
-            curr_data_page_no[zone_id] += SECT_NUM_PER_PAGE;
+            curr_cold_data_page_no[zone_id] += SECT_NUM_PER_PAGE;
             //find page which have been change 
             map_arr[pos] = copy_lsn[0];
             pos++;
@@ -497,8 +505,9 @@ void tftl_gc_run( int zone_id )
            temp_arr[k] = page_mapdir[((map_arr[i]/SECT_NUM_PER_PAGE)/MAP_ENTRIES_PER_PAGE)].ppn;
            temp_arr1[k] = map_arr[i];
            k++;
-            if (map_arr[i]/(SECT_NUM_PER_PAGE*PAGE_NUM_PER_BLK*BLOCK_NUM_PER_ZONE) != zone_id) {
-                printf("map_arr[i] = %d , zone_id = %d", map_arr[i], zone_id);}
+           if (map_arr[i]/(SECT_NUM_PER_PAGE*PAGE_NUM_PER_BLK*BLOCK_NUM_PER_ZONE) != zone_id) {
+               printf("map_arr[i] = %d , zone_id = %d", map_arr[i], zone_id);
+           }
            ASSERT(map_arr[i]/(SECT_NUM_PER_PAGE*PAGE_NUM_PER_BLK*BLOCK_NUM_PER_ZONE) == zone_id);
       }
       else
@@ -507,10 +516,10 @@ void tftl_gc_run( int zone_id )
 
   for ( i=0; i < k; i++) {
       //read the 2nd map table and invalidate it 
-
       nand_page_read(temp_arr[i]*SECT_NUM_PER_PAGE,copy,1);
-            if (temp_arr1[i]/(SECT_NUM_PER_PAGE*MAP_ENTRIES_PER_PAGE) != copy[0]/SECT_NUM_PER_PAGE) {
-                printf("temp_arr1[i] = %d , copy[0] = %d", temp_arr1[i], copy[0]);}
+      if (temp_arr1[i]/(SECT_NUM_PER_PAGE*MAP_ENTRIES_PER_PAGE) != copy[0]/SECT_NUM_PER_PAGE) {
+          printf("temp_arr1[i] = %d , copy[0] = %d", temp_arr1[i], copy[0]);
+      }
       ASSERT(temp_arr1[i]/(SECT_NUM_PER_PAGE*MAP_ENTRIES_PER_PAGE) == copy[0]/SECT_NUM_PER_PAGE);
       for(m = 0; m<SECT_NUM_PER_PAGE; m++){
          nand_invalidate(page_mapdir[((temp_arr1[i]/SECT_NUM_PER_PAGE)/MAP_ENTRIES_PER_PAGE)].ppn*SECT_NUM_PER_PAGE+m, copy[m]);
@@ -608,6 +617,8 @@ int tftl_init(blk_t blk_num, blk_t extra_num)
     curr_pagemap_page_no[i]  = 0;
     curr_data_blk_no[i] = nand_get_free_blk(i,0);
     curr_data_page_no[i] = 0;
+    curr_cold_data_blk_no[i] = nand_get_max_free_blk(i,0);
+    curr_cold_data_page_no[i] = 0;
   }
 
   curr_zone_id = 0;
@@ -631,7 +642,6 @@ int tftl_init(blk_t blk_num, blk_t extra_num)
   write_count =0;
   read_count = 0;
   save_count = 0;
-
 
   //initialize 2nd map table
   for(i = 0; i<page_mapdir_num; i++){
