@@ -50,12 +50,14 @@ struct zone_map_dir{
   int update;
 };
 
+//the zone base parameters
 #define MAP_ENTRIES_PER_PAGE 512
 #define PAGE_MAPDIR_NUM_PER_PAGE 512
-#define PAGE_MAPDIR_NUM_PER_ZONE 512
-#define BLOCK_NUM_PER_ZONE 4096
-#define ZONE_TABLE_NUM_PER_ZONE 1
-#define ZONE_NUM 8192/BLOCK_NUM_PER_ZONE
+#define ZONE_NUM 4
+int block_num_per_zone;
+int page_mapdir_num_per_zone;
+int zone_mapdir_num_per_zone;
+
 
 int TOTAL_MAP_ENTRIES; 
 

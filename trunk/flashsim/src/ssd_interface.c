@@ -156,10 +156,10 @@ void initFlash()
   // total number of blocks 
   total_blk_num      = total_sect_num / SECT_NUM_PER_BLK;     // total block number
   total_util_blk_num = total_util_sect_num / SECT_NUM_PER_BLK;    // total unique block number
+  total_extr_blk_num = total_extra_sect_num / SECT_NUM_PER_BLK;        // total extra block number
 
-  global_total_blk_num = total_util_blk_num;
-
-  total_extr_blk_num = total_blk_num - total_util_blk_num;        // total extra block number
+  global_total_util_blk_num = total_util_blk_num;
+  global_total_extra_blk_num = total_extr_blk_num;  
 
   ASSERT(total_extr_blk_num != 0);
 

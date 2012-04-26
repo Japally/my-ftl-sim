@@ -73,7 +73,8 @@ int ftl_type;
 extern int total_util_sect_num; 
 extern int total_extra_sect_num;
 
-int global_total_blk_num;
+int global_total_util_blk_num;
+int global_total_extra_blk_num;
 
 int warm_done; 
 

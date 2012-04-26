@@ -118,7 +118,7 @@ int nand_init (_u32 blk_num, _u8 min_free_blk_num)
     nand_blk[blk_no].fpc = SECT_NUM_PER_BLK;
     nand_blk[blk_no].ipc = 0;
     nand_blk[blk_no].lwn = -1;
-	  nand_blk[blk_no].zone_id = -1;
+	nand_blk[blk_no].zone_id = -1;
 
 
     for(i = 0; i<SECT_NUM_PER_BLK; i++){
@@ -132,11 +132,13 @@ int nand_init (_u32 blk_num, _u8 min_free_blk_num)
     }
   }
 
-	for (i = 0; i < ZONE_NUM; i++) {
-		free_blk_num[i] = BLOCK_NUM_PER_ZONE + 128;
-	}
-  
+  util_block_num_per_zone = global_total_util_blk_num / ZONE_NUM;
+  extra_block_num_per_zone = global_total_extra_blk_num / ZONE_NUM;
 
+  for (i = 0; i < ZONE_NUM; i++) {
+	free_blk_num[i] = util_block_num_per_zone + extra_block_num_per_zone;
+  }
+  
   free_blk_idx =0;
 
   nand_stat_reset();
@@ -295,13 +297,13 @@ _u8 nand_page_write(_u32 psn, _u32 *lsns, _u8 isGC, int map_flag)
   }
   else if(map_flag == 2) {
     nand_blk[pbn].page_status[pin/SECT_NUM_PER_PAGE] = 1; // 1 for 2nd pagemap table
-    if (pin == 0) { nand_blk[pbn].zone_id = lsns[0] / (SECT_NUM_PER_PAGE * PAGE_MAPDIR_NUM_PER_ZONE); }
-    ASSERT(lsns[0]/(SECT_NUM_PER_PAGE * PAGE_MAPDIR_NUM_PER_ZONE) == nand_blk[pbn].zone_id );
+    if (pin == 0) { nand_blk[pbn].zone_id = lsns[0] / (SECT_NUM_PER_PAGE * page_mapdir_num_per_zone); }
+    ASSERT(lsns[0]/(SECT_NUM_PER_PAGE * page_mapdir_num_per_zone) == nand_blk[pbn].zone_id );
   }
   else{
     nand_blk[pbn].page_status[pin/SECT_NUM_PER_PAGE] = 0; // 0 for data 
-    if (pin == 0) { nand_blk[pbn].zone_id = lsns[0] / (SECT_NUM_PER_PAGE * PAGE_NUM_PER_BLK * BLOCK_NUM_PER_ZONE); }
-    ASSERT(lsns[0]/(SECT_NUM_PER_PAGE * PAGE_NUM_PER_BLK * BLOCK_NUM_PER_ZONE) == nand_blk[pbn].zone_id );
+    if (pin == 0) { nand_blk[pbn].zone_id = lsns[0] / (SECT_NUM_PER_PAGE * PAGE_NUM_PER_BLK * util_block_num_per_zone); }
+    ASSERT(lsns[0]/(SECT_NUM_PER_PAGE * PAGE_NUM_PER_BLK * util_block_num_per_zone) == nand_blk[pbn].zone_id );
   }
 
   for (i = 0; i <SECT_NUM_PER_PAGE; i++) {
@@ -343,9 +345,9 @@ _u8 nand_page_write(_u32 psn, _u32 *lsns, _u8 isGC, int map_flag)
 void nand_erase (_u32 blk_no)
 {
   int i;
-	int zone_id;
+  int zone_id;
 
-	zone_id = blk_no/(BLOCK_NUM_PER_ZONE+128);
+  zone_id = blk_no/(util_block_num_per_zone + extra_block_num_per_zone);
 
   ASSERT(blk_no < nand_blk_num);
 
@@ -416,8 +418,8 @@ _u32 nand_get_max_free_blk (int zone_id, int isGC)
 
   MAX_ERASE = 0;
 
-  zone_blk_start = zone_id*(BLOCK_NUM_PER_ZONE + SPARE_BLK_NUM_PER_ZONE);
-  zone_blk_end = (zone_id+1)*(BLOCK_NUM_PER_ZONE + SPARE_BLK_NUM_PER_ZONE);
+  zone_blk_start = zone_id*(util_block_num_per_zone + extra_block_num_per_zone);
+  zone_blk_end = (zone_id+1)*(util_block_num_per_zone + extra_block_num_per_zone);
 
   for(i = zone_blk_start; i < zone_blk_end; i++) 
   {
@@ -460,8 +462,8 @@ _u32 nand_get_free_blk (int zone_id, int isGC)
 
   MIN_ERASE = 9999999;
 
-	zone_blk_start = zone_id*(BLOCK_NUM_PER_ZONE + SPARE_BLK_NUM_PER_ZONE);
-	zone_blk_end = (zone_id+1)*(BLOCK_NUM_PER_ZONE + SPARE_BLK_NUM_PER_ZONE);
+  zone_blk_start = zone_id*(util_block_num_per_zone + extra_block_num_per_zone);
+  zone_blk_end = (zone_id+1)*(util_block_num_per_zone + extra_block_num_per_zone);
 
   //in case that there is no avaible free block -> GC should be called !
   if ((isGC == 0) && (50 >= free_blk_num[zone_id])) {
