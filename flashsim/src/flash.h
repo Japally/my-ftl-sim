@@ -111,6 +111,9 @@ void nand_stat_reset();
 void nand_stat_print(FILE *outFP);
 int nand_oob_read(_u32 psn);
 
+int util_block_num_per_zone;
+int extra_block_num_per_zone;
+
 _u32 free_blk_num[ZONE_NUM];
 _u32 free_blk_idx;
 

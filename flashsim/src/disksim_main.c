@@ -96,7 +96,7 @@ void warmFlash(char *tname){
 
     delay = callFsim(blkno, bcount, 0);   
 
-    for(i = blkno; i<(blkno+bcount); i++){ dm_table[i] = DEV_FLASH; }
+    //for(i = blkno; i<(blkno+bcount); i++){ dm_table[i] = DEV_FLASH; }
   }
   nand_stat_reset();
 
