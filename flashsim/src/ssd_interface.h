@@ -16,6 +16,7 @@
 #include "flash.h"
 #include "type.h"
 
+
 #define READ_DELAY        (0.1309/4)
 #define WRITE_DELAY       (0.4059/4)
 #define ERASE_DELAY       1.5 

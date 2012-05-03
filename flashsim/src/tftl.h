@@ -7,6 +7,8 @@
  * Description: This is a header file for tftl.c.  
  * 
  */
+#ifndef TFTL
+#define TFTL
 
 #include "type.h"
 
@@ -50,14 +52,17 @@ struct zone_map_dir{
   int update;
 };
 
+struct page_map_dir *page_mapdir;
+struct zone_map_dir *zone_mapdir;
+
 //the zone base parameters
 #define MAP_ENTRIES_PER_PAGE 512
 #define PAGE_MAPDIR_NUM_PER_PAGE 512
-#define ZONE_NUM 4
+#define ZONE_NUM 2
+
 int block_num_per_zone;
 int page_mapdir_num_per_zone;
 int zone_mapdir_num_per_zone;
-
 
 int TOTAL_MAP_ENTRIES; 
 
@@ -72,6 +77,9 @@ _u32 tftl_gc_cost_benefit( int zone_id );
 void tftl_gc_get_free_blk(int zone_id, int mapdir_flag);
 void tftl_gc_run( int zone_id );
 int tftl_init(blk_t blk_num, blk_t extra_num);
+void switch_zone(int zone_id);
 
+int curr_zone_id;
+int curr_2nd_maptable_no;
 
-
+#endif 
