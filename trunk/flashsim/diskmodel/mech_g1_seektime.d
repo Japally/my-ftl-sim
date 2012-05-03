@@ -4,7 +4,7 @@ mech_g1_seektime.o: mech_g1_seektime.c mech_g1.h dm.h dm_config.h \
  /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
  /usr/include/gnu/stubs-32.h /usr/include/stdint.h \
  /usr/include/bits/wchar.h \
- /home/bang/my-ftl-sim/flashsim/libddbg/include/libddbg/libddbg.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libddbg/include/libddbg/libddbg.h \
  /usr/include/stdio.h \
  /usr/lib/gcc-lib/i486-linux-gnu/2.95.4/include/stddef.h \
  /usr/include/bits/types.h /usr/include/bits/typesizes.h \

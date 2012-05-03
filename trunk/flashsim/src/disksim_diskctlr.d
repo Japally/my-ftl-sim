@@ -23,9 +23,9 @@ disksim_diskctlr.o: disksim_diskctlr.c disksim_global.h \
  /usr/include/assert.h disksim_iosim.h disksim_ioface.h \
  disksim_device.h disksim_stat.h disksim_disk.h disksim_ioqueue.h \
  config.h \
- /home/bang/my-ftl-sim/flashsim/libparam/include/libparam/libparam.h \
- /home/bang/my-ftl-sim/flashsim/libparam/include/libparam/bitvector.h \
- /home/bang/my-ftl-sim/flashsim/libddbg/include/libddbg/libddbg.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libparam/include/libparam/libparam.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libparam/include/libparam/bitvector.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libddbg/include/libddbg/libddbg.h \
  modules/modules.h modules/disksim_bus_param.h \
  modules/disksim_bus_stats_param.h modules/disksim_cachedev_param.h \
  modules/disksim_cachemem_param.h modules/disksim_ctlr_param.h \
@@ -39,6 +39,6 @@ disksim_diskctlr.o: disksim_diskctlr.c disksim_global.h \
  modules/disksim_simpleflash_param.h modules/disksim_stats_param.h \
  modules/disksim_syncset_param.h modules/disksim_synthgen_param.h \
  modules/disksim_synthio_param.h ../diskmodel/dm.h \
- /home/bang/my-ftl-sim/flashsim/diskmodel/include/diskmodel/dm_types.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/diskmodel/include/diskmodel/dm_types.h \
  /usr/include/inttypes.h /usr/include/stdint.h \
  /usr/include/bits/wchar.h disksim_bus.h

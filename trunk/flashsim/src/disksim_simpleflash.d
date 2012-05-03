@@ -23,9 +23,9 @@ disksim_simpleflash.o: disksim_simpleflash.c disksim_global.h \
  /usr/include/assert.h disksim_iosim.h disksim_ioface.h \
  disksim_device.h disksim_stat.h disksim_simpleflash.h \
  disksim_ioqueue.h disksim_bus.h config.h \
- /home/bang/my-ftl-sim/flashsim/libparam/include/libparam/libparam.h \
- /home/bang/my-ftl-sim/flashsim/libparam/include/libparam/bitvector.h \
- /home/bang/my-ftl-sim/flashsim/libddbg/include/libddbg/libddbg.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libparam/include/libparam/libparam.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libparam/include/libparam/bitvector.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libddbg/include/libddbg/libddbg.h \
  modules/modules.h modules/disksim_bus_param.h \
  modules/disksim_bus_stats_param.h modules/disksim_cachedev_param.h \
  modules/disksim_cachemem_param.h modules/disksim_ctlr_param.h \

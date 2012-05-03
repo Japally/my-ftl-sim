@@ -22,9 +22,9 @@ disksim.o: disksim.c disksim_global.h disksim_rand48.h \
  /usr/include/bits/mathcalls.h disksim_assertlib.h \
  /usr/include/assert.h disksim_ioface.h disksim_pfface.h \
  disksim_iotrace.h config.h \
- /home/bang/my-ftl-sim/flashsim/libparam/include/libparam/libparam.h \
- /home/bang/my-ftl-sim/flashsim/libparam/include/libparam/bitvector.h \
- /home/bang/my-ftl-sim/flashsim/libddbg/include/libddbg/libddbg.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libparam/include/libparam/libparam.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libparam/include/libparam/bitvector.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libddbg/include/libddbg/libddbg.h \
  modules/modules.h modules/disksim_bus_param.h \
  modules/disksim_bus_stats_param.h modules/disksim_cachedev_param.h \
  modules/disksim_cachemem_param.h modules/disksim_ctlr_param.h \

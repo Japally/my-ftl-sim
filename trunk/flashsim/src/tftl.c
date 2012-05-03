@@ -14,9 +14,6 @@
 #include "ssd_interface.h"
 #include "disksim_global.h"
 
-struct page_map_dir *page_mapdir;
-struct zone_map_dir *zone_mapdir;
-
 int curr_zone_id;
 int curr_2nd_maptable_no;
 
@@ -39,12 +36,7 @@ void switch_zone(int zone_id)
 {
   int i;
 
-  ASSERT(zone_id != curr_zone_id);
-
-  //if the 1st maptable was update, flush the 1st maptable back to the 2nd maptable
-  if (page_mapdir[curr_2nd_maptable_no].update == 1) {
-    page_maptable_write(curr_2nd_maptable_no * SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
-  }
+  ASSERT(zone_id != curr_zone_id); 
 
   //if the 2nd maptable be update, flush the 2nd maptable back to the flash
   for(i=curr_zone_id*zone_mapdir_num_per_zone; i<(curr_zone_id+1)*zone_mapdir_num_per_zone; i++) {
@@ -218,7 +210,6 @@ void page_maptable_write (sect_t lsn, sect_t size, int mapdir_flag)
   nand_page_write(s_psn, lsns, 0, mapdir_flag);
   curr_pagemap_page_no[zone_id] += SECT_NUM_PER_PAGE;
   zone_mapdir[update_zone_maptable_no].update = 1;
-  page_mapdir[lpn].update = 0;
 }
 
 /***********************************************************************************************
@@ -244,6 +235,8 @@ size_t tftl_read(sect_t lsn, sect_t size, int mapdir_flag)
 
   sect_num = (size < SECT_NUM_PER_PAGE) ? size : SECT_NUM_PER_PAGE;
 
+
+/*
 //1.switch the working zome to target zone
   if( zone_id != curr_zone_id ) {
     switch_zone(zone_id);
@@ -257,6 +250,8 @@ size_t tftl_read(sect_t lsn, sect_t size, int mapdir_flag)
     }
     page_maptable_read(demand_2nd_maptable_no * SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
   }
+*/
+
 
 //3.read flash according the 2nd_maptable
   s_psn = tftl_pagemap[lpn].ppn * SECT_NUM_PER_PAGE;
@@ -292,6 +287,8 @@ size_t tftl_write(sect_t lsn, sect_t size, int mapdir_flag)
 
   s_lsn = lpn * SECT_NUM_PER_PAGE;
 
+
+/*
 //1.switch the working zone to target zone
   if( zone_id != curr_zone_id ) {
     switch_zone(zone_id);
@@ -305,6 +302,8 @@ size_t tftl_write(sect_t lsn, sect_t size, int mapdir_flag)
     }
     page_maptable_read(demand_2nd_maptable_no * SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
   }
+*/
+
 
 //3.find a free page to write the new data
   if (curr_data_page_no[zone_id] >= SECT_NUM_PER_BLK) {
@@ -337,10 +336,10 @@ size_t tftl_write(sect_t lsn, sect_t size, int mapdir_flag)
   nand_page_write(s_psn, lsns, 0, mapdir_flag);
   curr_data_page_no[zone_id] += SECT_NUM_PER_PAGE;
 
-//6.update the 1st_maptable and the update mark
+//6.update the 1st_maptable 
   ppn = s_psn / SECT_NUM_PER_PAGE;
   tftl_pagemap[lpn].ppn = ppn;
-  page_mapdir[curr_2nd_maptable_no].update = 1;
+  //page_mapdir[curr_2nd_maptable_no].update = 1;
 
   return sect_num;
 }
@@ -482,9 +481,15 @@ void tftl_gc_run( int zone_id )
             nand_page_write(SECTOR(curr_cold_data_blk_no[zone_id], curr_cold_data_page_no[zone_id]) & (~OFF_MASK_SECT), copy_lsn, 1, 1);
             ASSERT(copy_lsn[0]/(SECT_NUM_PER_PAGE*PAGE_NUM_PER_BLK * block_num_per_zone) == zone_id);
             curr_cold_data_page_no[zone_id] += SECT_NUM_PER_PAGE;
+            
+            if((tftl_pagemap[BLK_PAGE_NO_SECT(copy_lsn[0])].map_status == MAP_REAL) || (tftl_pagemap[BLK_PAGE_NO_SECT(copy_lsn[0])].map_status == MAP_GHOST)) {
+                delay_flash_update++;
+            }
+            else {
             //find page which have been change 
             map_arr[pos] = copy_lsn[0];
             pos++;
+            }
           }
     }
   }

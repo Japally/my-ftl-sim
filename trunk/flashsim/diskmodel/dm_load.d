@@ -4,7 +4,7 @@ dm_load.o: dm_load.c dm.h dm_config.h dm_types.h \
  /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
  /usr/include/gnu/stubs-32.h /usr/include/stdint.h \
  /usr/include/bits/wchar.h \
- /home/bang/my-ftl-sim/flashsim/libddbg/include/libddbg/libddbg.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libddbg/include/libddbg/libddbg.h \
  /usr/include/stdio.h \
  /usr/lib/gcc-lib/i486-linux-gnu/2.95.4/include/stddef.h \
  /usr/include/bits/types.h /usr/include/bits/typesizes.h \
@@ -17,9 +17,9 @@ dm_load.o: dm_load.c dm.h dm_config.h dm_types.h \
  /usr/include/bits/select.h /usr/include/bits/sigset.h \
  /usr/include/bits/time.h /usr/include/sys/sysmacros.h \
  /usr/include/bits/pthreadtypes.h /usr/include/alloca.h \
- /home/bang/my-ftl-sim/flashsim/libparam/include/libparam/libparam.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libparam/include/libparam/libparam.h \
  /usr/include/assert.h \
- /home/bang/my-ftl-sim/flashsim/libparam/include/libparam/bitvector.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libparam/include/libparam/bitvector.h \
  /usr/include/string.h /usr/include/xlocale.h modules/modules.h \
  modules/dm_disk_param.h modules/dm_layout_g1_param.h \
  modules/dm_layout_g1_zone_param.h modules/dm_mech_g1_param.h \

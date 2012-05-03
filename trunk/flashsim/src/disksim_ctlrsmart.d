@@ -23,9 +23,9 @@ disksim_ctlrsmart.o: disksim_ctlrsmart.c disksim_global.h \
  /usr/include/assert.h disksim_iosim.h disksim_ioface.h \
  disksim_device.h disksim_controller.h disksim_ctlr.h \
  disksim_ioqueue.h disksim_cache.h config.h \
- /home/bang/my-ftl-sim/flashsim/libparam/include/libparam/libparam.h \
- /home/bang/my-ftl-sim/flashsim/libparam/include/libparam/bitvector.h \
- /home/bang/my-ftl-sim/flashsim/libddbg/include/libddbg/libddbg.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libparam/include/libparam/libparam.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libparam/include/libparam/bitvector.h \
+ /home/bang/ftl_cache/my-ftl-sim/flashsim/libddbg/include/libddbg/libddbg.h \
  modules/modules.h modules/disksim_bus_param.h \
  modules/disksim_bus_stats_param.h modules/disksim_cachedev_param.h \
  modules/disksim_cachemem_param.h modules/disksim_ctlr_param.h \
