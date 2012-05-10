@@ -466,7 +466,7 @@ _u32 nand_get_free_blk (int zone_id, int isGC)
   zone_blk_end = (zone_id+1)*(util_block_num_per_zone + extra_block_num_per_zone);
 
   //in case that there is no avaible free block -> GC should be called !
-  if ((isGC == 0) && (50 >= free_blk_num[zone_id])) {
+  if ((isGC == 0) && (2 >= free_blk_num[zone_id])) {
     //printf("min_fb_num: %d\n", min_fb_num);
     return -1;
   }

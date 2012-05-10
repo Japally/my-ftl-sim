@@ -100,11 +100,16 @@ void warmFlash(char *tname){
   }
   nand_stat_reset();
 
-  if(ftl_type == 3) opagemap_reset(); 
-
+  if(ftl_type == 3) {
+    opagemap_reset(); 
+  }
   else if(ftl_type == 4) {
 	fast_reset();
-    write_count = 0; read_count = 0; }
+    write_count = 0; read_count = 0; 
+  }
+  else if(ftl_type == 5) {
+    tftl_pagemap_reset();
+  }
 
   fclose(fp);
 }

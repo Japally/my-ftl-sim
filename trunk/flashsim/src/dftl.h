@@ -17,14 +17,6 @@
 #define CACHE_INVALID 0
 #define CACHE_VALID 1
 
-int flash_hit;
-int disk_hit;
-int read_cache_hit;
-int write_cache_hit;
-int evict;
-int update_reqd;
-int delay_flash_update;
-int save_count;
 struct ftl_operation * opm_setup();
 
 struct opm_entry {
@@ -42,14 +34,6 @@ struct omap_dir{
 };
 
 #define MAP_ENTRIES_PER_PAGE 512
-
-int TOTAL_MAP_ENTRIES; 
-int MAP_REAL_NUM_ENTRIES;
-int MAP_GHOST_NUM_ENTRIES;
-
-int CACHE_NUM_ENTRIES;
-
-static int SYNC_NUM;
 
 sect_t opagemap_num;
 struct opm_entry *opagemap;

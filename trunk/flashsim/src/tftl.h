@@ -19,14 +19,8 @@
 #define CACHE_INVALID 0
 #define CACHE_VALID 1
 
-int flash_hit;
-int disk_hit;
-int read_cache_hit;
-int write_cache_hit;
-int evict;
-int update_reqd;
-int delay_flash_update;
-int save_count;
+int swicth_num;
+
 struct ftl_operation * tftl_setup();
 
 
@@ -81,5 +75,18 @@ void switch_zone(int zone_id);
 
 int curr_zone_id;
 int curr_2nd_maptable_no;
+int curr_2nd_maptable_update_mark;
+
+_u32 curr_zonemap_blk_no;
+_u16 curr_zonemap_page_no;
+
+_u32 curr_pagemap_blk_no[ZONE_NUM];
+_u16 curr_pagemap_page_no[ZONE_NUM];
+
+_u32 curr_data_blk_no[ZONE_NUM];
+_u16 curr_data_page_no[ZONE_NUM];
+
+_u32 curr_cold_data_blk_no[ZONE_NUM];
+_u16 curr_cold_data_page_no[ZONE_NUM];
 
 #endif 
