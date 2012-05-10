@@ -277,11 +277,6 @@ int pm_init(blk_t blk_num, blk_t extra_num)
   free_blk_no[1] = nand_get_free_blk(0,0);
   free_page_no[1] = 0;
 
-  MAP_REAL_NUM_ENTRIES = 0;
-  MAP_GHOST_NUM_ENTRIES = 0;
-  CACHE_NUM_ENTRIES = 0;
-  SYNC_NUM = 0;
-
   cache_hit = 0;
   flash_hit = 0;
   disk_hit = 0;

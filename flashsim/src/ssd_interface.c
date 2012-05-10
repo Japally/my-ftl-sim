@@ -29,7 +29,7 @@ int old_merge_full_num= 0;
 int old_flash_gc_read_num = 0;
 int old_flash_erase_num = 0;
 int req_count_num = 1;
-int cache_hit, rqst_cnt;
+
 int flag1 = 1;
 int count = 0;
 
@@ -202,11 +202,30 @@ void printWearout()
   fclose(fp);
 }
 
+void printCacheStat()
+{
+    FILE *fp = fopen("CacheStat", "w");
+
+    fprintf(fp, "Cache STATISTICS\n");
+    fprintf(fp, "------------------------------------------------------------\n");
+    fprintf(fp, " cache_hit (#): %8u   ", cache_hit);
+    fprintf(fp, " flash_hit (#): %8u   ", flash_hit);
+    fprintf(fp, " read_count (#): %8u   ", read_count);
+    fprintf(fp, " write_count (#): %8u\n", write_count);
+    fprintf(fp, " evict (#): %8u   ", evict);
+    fprintf(fp, " delay_flash_update (#): %8u   ", delay_flash_update);
+    fprintf(fp, " save_count (#): %8u\n", save_count);
+    fprintf(fp, " update_evict (#): %8u   ", update_evict);
+    fprintf(fp, " swicth_num (#): %8u\n", swicth_num);
+    fprintf(fp, "------------------------------------------------------------\n");
+}
+
 
 void endFlash()
 {
 
   nand_stat_print(outputfile);
+  printCacheStat();
   printWearout();
   ftl_op->end;
   nand_end();
@@ -417,7 +436,7 @@ double callFsim(unsigned int secno, int scount, int operation)
   int i;
   int entry_counter;
   int pos=-1,pos_real=-1,pos_ghost=-1;
-  int demand_2nd_map_page_no;
+  int demand_2nd_maptable_no;
   int demand_zone_id;
 
   if(ftl_type == 1){ }
@@ -479,7 +498,7 @@ double callFsim(unsigned int secno, int scount, int operation)
 
     while(cnt > 0)
     {
-          cnt--;
+        cnt--;
 
         // page based FTL
         if(ftl_type == 1){
@@ -502,7 +521,6 @@ double callFsim(unsigned int secno, int scount, int operation)
           *************************************************/
           //1. pagemap in SRAM 
 
-            rqst_cnt++;
           if((opagemap[blkno].map_status == MAP_REAL) || (opagemap[blkno].map_status == MAP_GHOST))
           {
             cache_hit++;
@@ -561,7 +579,7 @@ double callFsim(unsigned int secno, int scount, int operation)
                   evict++;
 
                 if(opagemap[min_ghost].update == 1) {
-                  update_reqd++;
+                  update_evict++;
                   opagemap[min_ghost].update = 0;
                   send_flash_request(((min_ghost-page_num_for_2nd_map_table)/MAP_ENTRIES_PER_PAGE)*4, 4, 1, 2);   // read from 2nd mapping table then update it
 
@@ -676,8 +694,14 @@ double callFsim(unsigned int secno, int scount, int operation)
             //2.entry hit curr_2nd_maptable, if request is spatial locality, this cache scheme will help a lot
             else if ( blkno / MAP_ENTRIES_PER_PAGE == curr_2nd_maptable_no ) {
 
+              cache_hit++;
+
+              if ( MIN_SEQ_REQ_NUM >= bcount ) {
                 if((MAP_REAL_MAX_ENTRIES - MAP_REAL_NUM_ENTRIES) == 0) {
                     if((MAP_GHOST_MAX_ENTRIES - MAP_GHOST_NUM_ENTRIES) == 0) {
+
+                        evict++;
+
                         //evict entries of the same 2nd_map_page as the min ghost from ghost cache to flash
                         min_ghost = find_min_ghost_entry_tftl();
 
@@ -685,25 +709,34 @@ double callFsim(unsigned int secno, int scount, int operation)
 
                             //find those entries of the same 2nd_map_page which should be update in the ghost cache
                             demand_zone_id = min_ghost / (PAGE_NUM_PER_BLK * block_num_per_zone);
-                            demand_2nd_map_page_no = min_ghost / MAP_ENTRIES_PER_PAGE;
+                            demand_2nd_maptable_no = min_ghost / MAP_ENTRIES_PER_PAGE;
 
                             entry_counter = 0;
                             for (i=0; i<MAP_GHOST_MAX_ENTRIES; i++) {
-                                if (ghost_arr[i]/MAP_ENTRIES_PER_PAGE == demand_2nd_map_page_no && tftl_pagemap[ghost_arr[i]].update == 1) {
+                                if (ghost_arr[i]/MAP_ENTRIES_PER_PAGE == demand_2nd_maptable_no && tftl_pagemap[ghost_arr[i]].update == 1) {
                                     tftl_pagemap[ghost_arr[i]].update = 0;
                                     tftl_pagemap[ghost_arr[i]].map_status = MAP_INVALID;
                                     ghost_arr[i] = -1;
                                     entry_counter++;
+                                    update_evict++;
                                 }
                             }
 
                             if ( demand_zone_id != curr_zone_id ) { switch_zone(demand_zone_id); }
 
-                            // read from 2nd mapping table then update it
-                            page_maptable_read (demand_2nd_map_page_no*SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
+                            //read 1st map_table from flash according to the 2nd_maptable
+                            if (demand_2nd_maptable_no != curr_2nd_maptable_no) {
+                                if (page_mapdir[curr_2nd_maptable_no].update == 1) {
+                                    page_maptable_write(curr_2nd_maptable_no * SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
+                                }
+                                page_maptable_read(demand_2nd_maptable_no*SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
+                            }
+                            else {
+                                page_mapdir[curr_2nd_maptable_no].update == 1;
+                            }
 
                             // write into 2nd mapping table 
-                            page_maptable_write (demand_2nd_map_page_no*SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
+                            page_maptable_write(demand_2nd_maptable_no*SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
 
                             //handle the cache queue
                             MAP_GHOST_NUM_ENTRIES = MAP_GHOST_NUM_ENTRIES - entry_counter;
@@ -738,12 +771,19 @@ double callFsim(unsigned int secno, int scount, int operation)
                 pos = find_free_pos(real_arr,MAP_REAL_MAX_ENTRIES);
                 real_arr[pos] = blkno;
                 MAP_REAL_NUM_ENTRIES++;
+              }
             }
             //3.entry not in sram
             else {
+
+              flash_hit++;
+
+              if ( MIN_SEQ_REQ_NUM >= bcount ) {
                 //if cache entries in SRAM is full
                 if((MAP_REAL_MAX_ENTRIES - MAP_REAL_NUM_ENTRIES) == 0) {
                     if((MAP_GHOST_MAX_ENTRIES - MAP_GHOST_NUM_ENTRIES) == 0) {
+
+                        evict++;
 
                         //evict entries of the same 2nd_map_page as the min ghost from ghost cache to flash
                         min_ghost = find_min_ghost_entry_tftl();
@@ -751,25 +791,35 @@ double callFsim(unsigned int secno, int scount, int operation)
                         if(tftl_pagemap[min_ghost].update == 1) {
 
                             //find those entries of the same 2nd_map_page which should be update in the ghost cache
-                            demand_2nd_map_page_no = min_ghost / MAP_ENTRIES_PER_PAGE;
+                            demand_2nd_maptable_no = min_ghost / MAP_ENTRIES_PER_PAGE;
                             demand_zone_id = min_ghost / (PAGE_NUM_PER_BLK * block_num_per_zone);
 
                             entry_counter = 0;
                             for (i=0; i<MAP_GHOST_MAX_ENTRIES; i++) {
-                                if (ghost_arr[i]/MAP_ENTRIES_PER_PAGE == demand_2nd_map_page_no && tftl_pagemap[ghost_arr[i]].update == 1) {
+                                if (ghost_arr[i]/MAP_ENTRIES_PER_PAGE == demand_2nd_maptable_no && tftl_pagemap[ghost_arr[i]].update == 1 ) {
                                     tftl_pagemap[ghost_arr[i]].update = 0;
                                     tftl_pagemap[ghost_arr[i]].map_status = MAP_INVALID;
                                     ghost_arr[i] = -1;
                                     entry_counter++;
+                                    update_evict++;
                                 }
                             }
 
                             if ( demand_zone_id != curr_zone_id ) { switch_zone(demand_zone_id); }
 
-                            // read from 2nd mapping table then update it
-                            page_maptable_read (demand_2nd_map_page_no*SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
-                            // write into 2nd mapping table 
-                            page_maptable_write (demand_2nd_map_page_no*SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
+                            //read 1st map_table from flash according to the 2nd_maptable
+                            if (demand_2nd_maptable_no != curr_2nd_maptable_no) {
+                                if (page_mapdir[curr_2nd_maptable_no].update == 1) {
+                                    page_maptable_write(curr_2nd_maptable_no * SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
+                                }
+                                page_maptable_read(demand_2nd_maptable_no*SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
+                            }
+                            else {
+                                page_mapdir[curr_2nd_maptable_no].update == 1;
+                            }
+
+                            // update and write into 2nd mapping table 
+                            page_maptable_write (demand_2nd_maptable_no*SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
 
                             //handle the cache queue
                             MAP_GHOST_NUM_ENTRIES = MAP_GHOST_NUM_ENTRIES - entry_counter;
@@ -797,12 +847,15 @@ double callFsim(unsigned int secno, int scount, int operation)
 
                 //switch zone
                 demand_zone_id = blkno / ( PAGE_NUM_PER_BLK * block_num_per_zone );
-                demand_2nd_map_page_no = blkno / MAP_ENTRIES_PER_PAGE;
+                demand_2nd_maptable_no = blkno / MAP_ENTRIES_PER_PAGE;
                 if ( demand_zone_id != curr_zone_id ) { switch_zone(demand_zone_id); }
 
                 //read 1st map_table from flash according to the 2nd_maptable
-                if (demand_2nd_map_page_no != curr_2nd_maptable_no) {
-                    page_maptable_read (demand_2nd_map_page_no*SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
+                if (demand_2nd_maptable_no != curr_2nd_maptable_no) {
+                    if (page_mapdir[curr_2nd_maptable_no].update == 1) {
+                        page_maptable_write(curr_2nd_maptable_no * SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
+                    }
+                    page_maptable_read(demand_2nd_maptable_no*SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
                 }
                 
                 //handle the cache queue
@@ -813,15 +866,57 @@ double callFsim(unsigned int secno, int scount, int operation)
                 pos = find_free_pos(real_arr,MAP_REAL_MAX_ENTRIES);
                 real_arr[pos] = blkno;
                 MAP_REAL_NUM_ENTRIES++;
+              }
+              else {
+                demand_zone_id = blkno / ( PAGE_NUM_PER_BLK * block_num_per_zone );
+                demand_2nd_maptable_no = blkno / MAP_ENTRIES_PER_PAGE;
+
+                if ( demand_zone_id != curr_zone_id ) { switch_zone(demand_zone_id); }
+
+                //read 1st map_table from flash according to the 2nd_maptable
+                if (demand_2nd_maptable_no != curr_2nd_maptable_no) {
+                    if (page_mapdir[curr_2nd_maptable_no].update == 1) {
+                        page_maptable_write(curr_2nd_maptable_no * SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
+                    }
+                    page_maptable_read(demand_2nd_maptable_no*SECT_NUM_PER_PAGE, SECT_NUM_PER_PAGE, 2);
+                }
+              }
             }
 
             //send request to flash after using cache
-            if(operation==0) { tftl_pagemap[blkno].update = 1; }
+            if(operation==0) {
+                if((tftl_pagemap[blkno].map_status == MAP_REAL) || (tftl_pagemap[blkno].map_status == MAP_GHOST)) {
+                    tftl_pagemap[blkno].update = 1;
+                }
+                else {
+                    if(MIN_SEQ_REQ_NUM >= bcount) {
+                        tftl_pagemap[blkno].update = 1;
+                    }
+                }
+            }
 
-            send_flash_request(blkno*4, 4, operation, 1); 
+            if((tftl_pagemap[blkno].map_status == MAP_REAL) || (tftl_pagemap[blkno].map_status == MAP_GHOST)) {
+                curr_2nd_maptable_update_mark = 0;
+            }
+            else {
+                if ( MIN_SEQ_REQ_NUM >= bcount ) {
+                    curr_2nd_maptable_update_mark = 0;
+                }
+                else {
+                    curr_2nd_maptable_update_mark = 1;
+                }
+            }
+
+            if(operation == 0){
+                write_count++;
+            }
+            else {
+                read_count++;
+            }
+
+            send_flash_request(blkno*4, 4, operation, 1);
             blkno++;
         }
-
     }
     break;
   }

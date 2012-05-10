@@ -36,6 +36,8 @@ struct ftl_operation * ftl_op;
 #define GC_PAGE_READ  5
 #define GC_PAGE_WRITE 6
 
+#define MIN_SEQ_REQ_NUM 8
+
 void reset_flash_stat();
 double calculate_delay_flash();
 void initFlash();
@@ -48,10 +50,6 @@ int find_min_ghost_entry();
 void synchronize_disk_flash();
 void find_min_cache();
 double callFsim(unsigned int secno, int scount, int operation);
-
-int write_count;
-int read_count;
-
 
 int flash_read_num;
 int flash_write_num;
@@ -90,4 +88,24 @@ int last_unique_log_blk;
 
 int total_extr_blk_num;
 int total_init_blk_num;
+
+int TOTAL_MAP_ENTRIES; 
+int MAP_REAL_NUM_ENTRIES;
+int MAP_GHOST_NUM_ENTRIES;
+int CACHE_NUM_ENTRIES;
+static int SYNC_NUM;
+
+//Cache STATISTICS
+int cache_hit;
+int flash_hit;
+int read_cache_hit;
+int write_cache_hit;
+int evict;
+int update_evict;
+int delay_flash_update;
+int save_count;
+int write_count;
+int read_count;
+
+
 
