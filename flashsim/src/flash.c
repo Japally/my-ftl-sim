@@ -15,10 +15,12 @@
 #include <string.h>
 #include "flash.h"
 #include "ssd_interface.h"
+#include "disksim_global.h"
 
 _u32 nand_blk_num, min_fb_num;
 _u8  pb_size;
 struct nand_blk_info *nand_blk;
+
 
 int MIN_ERASE;
 int MAX_ERASE;
@@ -132,10 +134,10 @@ int nand_init (_u32 blk_num, _u8 min_free_blk_num)
     }
   }
 
-  util_block_num_per_zone = global_total_util_blk_num / ZONE_NUM;
-  extra_block_num_per_zone = global_total_extra_blk_num / ZONE_NUM;
+  util_block_num_per_zone = global_total_util_blk_num / zone_num;
+  extra_block_num_per_zone = global_total_extra_blk_num / zone_num;
 
-  for (i = 0; i < ZONE_NUM; i++) {
+  for (i = 0; i < zone_num; i++) {
 	free_blk_num[i] = util_block_num_per_zone + extra_block_num_per_zone;
   }
   

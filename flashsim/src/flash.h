@@ -17,7 +17,6 @@
 #include  "type.h"
 #include "tftl.h"
 
-
 #define LB_SIZE_512  1
 #define LB_SIZE_1024 2
 #define LB_SIZE_2048 4
@@ -114,7 +113,7 @@ int nand_oob_read(_u32 psn);
 int util_block_num_per_zone;
 int extra_block_num_per_zone;
 
-_u32 free_blk_num[ZONE_NUM];
+_u32 free_blk_num[50];
 _u32 free_blk_idx;
 
 _u32 stat_read_num, stat_write_num, stat_erase_num;

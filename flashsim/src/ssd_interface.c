@@ -189,47 +189,51 @@ void initFlash()
   nand_stat_reset();
 }
 
-void printWearout()
+void printWearout(FILE *outFP)
 {
   int i;
-  FILE *fp = fopen("wearout", "w");
-  
+
+  fprintf(outFP, "\n");
+  fprintf(outFP, "Wear STATISTICS\n");
+  fprintf(outFP, "------------------------------------------------------------\n");
+
   for(i = 0; i<nand_blk_num; i++)
   {
-    fprintf(fp, "%d %d\n", i, nand_blk[i].state.ec);
+    fprintf(outFP, "%d %d\n", i, nand_blk[i].state.ec);
   }
+  fprintf(outFP, "------------------------------------------------------------\n");
 
-  fclose(fp);
 }
 
-void printCacheStat()
+void printCacheStat(FILE *outFP)
 {
-    FILE *fp = fopen("CacheStat", "w");
-
-    fprintf(fp, "Cache STATISTICS\n");
-    fprintf(fp, "------------------------------------------------------------\n");
-    fprintf(fp, " cache_hit (#): %8u   ", cache_hit);
-    fprintf(fp, " flash_hit (#): %8u   ", flash_hit);
-    fprintf(fp, " read_count (#): %8u   ", read_count);
-    fprintf(fp, " write_count (#): %8u\n", write_count);
-    fprintf(fp, " evict (#): %8u   ", evict);
-    fprintf(fp, " delay_flash_update (#): %8u   ", delay_flash_update);
-    fprintf(fp, " save_count (#): %8u\n", save_count);
-    fprintf(fp, " update_evict (#): %8u   ", update_evict);
-    fprintf(fp, " swicth_num (#): %8u\n", swicth_num);
-    fprintf(fp, "------------------------------------------------------------\n");
+    fprintf(outFP, "****************************************************************************\n");
+    fprintf(outFP, "                               Flash Memory Statistics                      \n");
+    fprintf(outFP, "****************************************************************************\n");
+    fprintf(outFP, "\n");
+    fprintf(outFP, "Cache STATISTICS\n");
+    fprintf(outFP, "------------------------------------------------------------\n");
+    fprintf(outFP, " cache_hit (#): %8u   ", cache_hit);
+    fprintf(outFP, " flash_hit (#): %8u   ", flash_hit);
+    fprintf(outFP, " read_count (#): %8u   ", read_count);
+    fprintf(outFP, " write_count (#): %8u\n", write_count);
+    fprintf(outFP, " evict (#): %8u   ", evict);
+    fprintf(outFP, " delay_flash_update (#): %8u   ", delay_flash_update);
+    fprintf(outFP, " save_count (#): %8u\n", save_count);
+    fprintf(outFP, " update_evict (#): %8u   ", update_evict);
+    fprintf(outFP, " swicth_num (#): %8u\n", swicth_num);
+    fprintf(outFP, "------------------------------------------------------------\n");
 }
 
 
 void endFlash()
 {
-
+  printCacheStat(outputfile);
   nand_stat_print(outputfile);
-  printCacheStat();
-  printWearout();
+  printWearout(outputfile);
   ftl_op->end;
   nand_end();
-}  
+}
 
 /***********************************************************************
   Send request (lsn, sector_cnt, operation flag)

@@ -66,6 +66,12 @@ INIT result->type = i;
 
 This specifies FTL type.
 
+PARAM Zone Num				I	1
+TEST i >= 1 
+INIT result->zone_num = i;
+
+This specifies Zone Num.
+
 PARAM Bus transaction latency			D	0
 TEST d >= 0.0
 INIT result->bus_transaction_latency = d;

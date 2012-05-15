@@ -52,7 +52,6 @@ struct zone_map_dir *zone_mapdir;
 //the zone base parameters
 #define MAP_ENTRIES_PER_PAGE 512
 #define PAGE_MAPDIR_NUM_PER_PAGE 512
-#define ZONE_NUM 2
 
 int block_num_per_zone;
 int page_mapdir_num_per_zone;
@@ -80,13 +79,13 @@ int curr_2nd_maptable_update_mark;
 _u32 curr_zonemap_blk_no;
 _u16 curr_zonemap_page_no;
 
-_u32 curr_pagemap_blk_no[ZONE_NUM];
-_u16 curr_pagemap_page_no[ZONE_NUM];
+_u32 curr_pagemap_blk_no[100];
+_u16 curr_pagemap_page_no[100];
 
-_u32 curr_data_blk_no[ZONE_NUM];
-_u16 curr_data_page_no[ZONE_NUM];
+_u32 curr_data_blk_no[100];
+_u16 curr_data_page_no[100];
 
-_u32 curr_cold_data_blk_no[ZONE_NUM];
-_u16 curr_cold_data_page_no[ZONE_NUM];
+_u32 curr_cold_data_blk_no[100];
+_u16 curr_cold_data_page_no[100];
 
 #endif 
