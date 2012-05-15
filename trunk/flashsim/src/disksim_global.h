@@ -475,6 +475,7 @@ void disksim_run_simulation ();
 int flash_numblocks; 
 int flash_extrblocks; 
 int ftl_type; 
+int zone_num;
 int total_sect_num;
 int total_util_sect_num; 
 int total_extra_sect_num;

@@ -122,6 +122,7 @@
 int flash_numblocks;
 int flash_extrblocks;
 int ftl_type = -1;
+int zone_num;
 int req_num = 1;
 
 /* read-only globals used during readparams phase */
@@ -145,6 +146,7 @@ typedef struct simpleflash {
 //flashsim
     int type; 
     int extrblocks;
+    int zone_num;
 
    double acctime;
    double overhead;
@@ -926,6 +928,7 @@ struct simpleflash *disksim_simpleflash_loadparams(struct lp_block *b)
   flash_numblocks = result->numblocks;
   flash_extrblocks = result->extrblocks;
   ftl_type = result->type;
+  zone_num = result->zone_num;
 
   device_add((struct device_header *)result, num);
   return result;

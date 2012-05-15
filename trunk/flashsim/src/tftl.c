@@ -13,7 +13,7 @@
 #include "flash.h"
 #include "ssd_interface.h"
 #include "disksim_global.h"
-
+#include "tftl.h"
 
 /****************************************************************************************
                                the map_table operation
@@ -284,6 +284,8 @@ size_t tftl_write(sect_t lsn, sect_t size, int mapdir_flag)
   demand_2nd_maptable_no = lpn / MAP_ENTRIES_PER_PAGE;
 
 /*
+
+
 //1.switch the working zone to target zone
   if( zone_id != curr_zone_id ) {
 
@@ -306,7 +308,7 @@ size_t tftl_write(sect_t lsn, sect_t size, int mapdir_flag)
 //3.find a free page to write the new data
   if (curr_data_page_no[zone_id] >= SECT_NUM_PER_BLK) {
       if ((curr_data_blk_no[zone_id] = nand_get_free_blk(zone_id, 0)) == -1) {
-        //if ( zone_id == curr_zone_id ) { switch_zone(demand_zone_id); }
+        if ( zone_id != curr_zone_id ) { switch_zone(zone_id); }
         while (free_blk_num[zone_id] < 4 ){ tftl_gc_run( zone_id );}
         tftl_gc_get_free_blk(zone_id, mapdir_flag);
       }
@@ -617,9 +619,9 @@ int tftl_init(blk_t blk_num, blk_t extra_num)
   memset(zone_mapdir,  0xFF, sizeof (struct zone_map_dir) * zone_mapdir_num);
 
   //init the zone base parameters
-  block_num_per_zone = blk_num / ZONE_NUM;
-  page_mapdir_num_per_zone = page_mapdir_num / ZONE_NUM;
-  zone_mapdir_num_per_zone = zone_mapdir_num / ZONE_NUM;
+  block_num_per_zone = blk_num / zone_num;
+  page_mapdir_num_per_zone = page_mapdir_num / zone_num;
+  zone_mapdir_num_per_zone = zone_mapdir_num / zone_num;
 
   //youkim: initialize 1st map table 
   TOTAL_MAP_ENTRIES = tftl_pagemap_num;
@@ -635,7 +637,7 @@ int tftl_init(blk_t blk_num, blk_t extra_num)
   curr_zonemap_blk_no = nand_get_free_blk(0,0);
   curr_zonemap_page_no = 0;
 
-  for(i = 0; i<ZONE_NUM; i++){
+  for(i = 0; i<zone_num; i++){
     curr_pagemap_blk_no[i]  = nand_get_free_blk(i,0);
     curr_pagemap_page_no[i]  = 0;
     curr_data_blk_no[i] = nand_get_free_blk(i,0);

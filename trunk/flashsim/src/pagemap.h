@@ -45,6 +45,6 @@ struct map_dir{
 };
 
 #define MAP_ENTRIES_PER_PAGE 512
-
+int TOTAL_MAP_ENTRIES; 
 sect_t pagemap_num;
 struct pm_entry *pagemap;
