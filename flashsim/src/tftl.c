@@ -89,7 +89,7 @@ void zone_maptable_write (sect_t lsn, sect_t size, int mapdir_flag)
   
   if (curr_zonemap_page_no >= SECT_NUM_PER_BLK) {
       if ((curr_zonemap_blk_no = nand_get_free_blk(curr_zone_id,0)) == -1) {
-        while (free_blk_num[curr_zone_id] < 4 ) { tftl_gc_run(curr_zone_id);}
+        while (free_blk_num[curr_zone_id] < 10 ) { tftl_gc_run(curr_zone_id);}
         tftl_gc_get_free_blk(curr_zone_id, mapdir_flag);
       }
       else {
@@ -170,7 +170,7 @@ void page_maptable_write (sect_t lsn, sect_t size, int mapdir_flag)
 
   if (curr_pagemap_page_no[zone_id] >= SECT_NUM_PER_BLK) {
       if ((curr_pagemap_blk_no[zone_id] = nand_get_free_blk(zone_id, 0)) == -1) {
-        while (free_blk_num[zone_id] < 4 ){ tftl_gc_run(zone_id);}
+        while (free_blk_num[zone_id] < 10 ){ tftl_gc_run(zone_id);}
         tftl_gc_get_free_blk(zone_id, mapdir_flag);
       }
       else {
@@ -309,7 +309,7 @@ size_t tftl_write(sect_t lsn, sect_t size, int mapdir_flag)
   if (curr_data_page_no[zone_id] >= SECT_NUM_PER_BLK) {
       if ((curr_data_blk_no[zone_id] = nand_get_free_blk(zone_id, 0)) == -1) {
         if ( zone_id != curr_zone_id ) { switch_zone(zone_id); }
-        while (free_blk_num[zone_id] < 4 ){ tftl_gc_run( zone_id );}
+        while (free_blk_num[zone_id] < 10 ){ tftl_gc_run( zone_id );}
         tftl_gc_get_free_blk(zone_id, mapdir_flag);
       }
       else {
